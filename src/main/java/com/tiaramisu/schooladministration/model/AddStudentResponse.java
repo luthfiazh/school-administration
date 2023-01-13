@@ -7,5 +7,6 @@ import lombok.Data;
 @Builder
 public class AddStudentResponse {
     private String email;
+    private String responseCode;
     private String responseMessage;
 }
