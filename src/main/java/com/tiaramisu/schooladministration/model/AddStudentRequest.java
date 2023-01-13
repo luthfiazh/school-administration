@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class AddStudentResponse {
+public class AddStudentRequest {
     private String email;
-    private String responseMessage;
+    private String name;
 }
