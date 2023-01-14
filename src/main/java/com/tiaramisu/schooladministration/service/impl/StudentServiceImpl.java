@@ -13,13 +13,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
-import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_STUDENT_BAD_REQUEST_CODE;
-import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_STUDENT_DUPLICATE_ENTRY_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_STUDENT_ERROR_CODE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_STUDENT_INVALID_REQUEST_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_STUDENT_SUCCESS_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_STUDENT_BAD_REQUEST_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_STUDENT_DUPLICATE_ENTRY_MESSAGE;
-import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_STUDENT_ERROR_MESSAGE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_STUDENT_GENERIC_ERROR_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_STUDENT_SUCCESS_MESSAGE;
 
 @Service
@@ -32,7 +31,7 @@ public class StudentServiceImpl implements StudentService {
         try {
             if (checkEmptyRequest(addStudentRequest)) {
                 return AddStudentResponse.builder()
-                        .responseCode(ADD_STUDENT_BAD_REQUEST_CODE)
+                        .responseCode(ADD_STUDENT_INVALID_REQUEST_CODE)
                         .responseMessage(ADD_STUDENT_BAD_REQUEST_MESSAGE)
                         .build();
             }
@@ -51,13 +50,13 @@ public class StudentServiceImpl implements StudentService {
         } catch (DataIntegrityViolationException dataIntegrityViolationException) {
             return AddStudentResponse.builder()
                     .email(addStudentRequest.getEmail())
-                    .responseCode(ADD_STUDENT_DUPLICATE_ENTRY_CODE)
+                    .responseCode(ADD_STUDENT_INVALID_REQUEST_CODE)
                     .responseMessage(ADD_STUDENT_DUPLICATE_ENTRY_MESSAGE)
                     .build();
         } catch (DataAccessException dataAccessException) {
             return AddStudentResponse.builder()
                     .responseCode(ADD_STUDENT_ERROR_CODE)
-                    .responseMessage(ADD_STUDENT_ERROR_MESSAGE)
+                    .responseMessage(ADD_STUDENT_GENERIC_ERROR_MESSAGE)
                     .build();
         }
     }
