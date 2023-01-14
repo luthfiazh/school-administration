@@ -7,11 +7,14 @@ import com.tiaramisu.schooladministration.repository.StudentRepository;
 import com.tiaramisu.schooladministration.service.StudentService;
 import liquibase.repackaged.org.apache.commons.lang3.StringUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_STUDENT_BAD_REQUEST_CODE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_STUDENT_ERROR_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_STUDENT_SUCCESS_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_STUDENT_BAD_REQUEST_MESSAGE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_STUDENT_ERROR_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_STUDENT_SUCCESS_MESSAGE;
 
 @Service
@@ -21,22 +24,29 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public AddStudentResponse addStudent(AddStudentRequest addStudentRequest) {
-        if (checkEmptyRequest(addStudentRequest)) {
+        try {
+            if (checkEmptyRequest(addStudentRequest)) {
+                return AddStudentResponse.builder()
+                        .responseCode(ADD_STUDENT_BAD_REQUEST_CODE)
+                        .responseMessage(ADD_STUDENT_BAD_REQUEST_MESSAGE)
+                        .build();
+            }
+            final Student studentToBeSaved = Student.builder()
+                    .email(addStudentRequest.getEmail())
+                    .name(addStudentRequest.getName())
+                    .build();
+            final Student savedStudentData = studentRepository.save(studentToBeSaved);
             return AddStudentResponse.builder()
-                    .responseCode(ADD_STUDENT_BAD_REQUEST_CODE)
-                    .responseMessage(ADD_STUDENT_BAD_REQUEST_MESSAGE)
+                    .email(savedStudentData.getEmail())
+                    .responseCode(ADD_STUDENT_SUCCESS_CODE)
+                    .responseMessage(ADD_STUDENT_SUCCESS_MESSAGE)
+                    .build();
+        } catch (DataAccessException dataAccessException) {
+            return AddStudentResponse.builder()
+                    .responseCode(ADD_STUDENT_ERROR_CODE)
+                    .responseMessage(ADD_STUDENT_ERROR_MESSAGE)
                     .build();
         }
-        final Student studentToBeSaved = Student.builder()
-                .email(addStudentRequest.getEmail())
-                .name(addStudentRequest.getName())
-                .build();
-        final Student savedStudentData = studentRepository.save(studentToBeSaved);
-        return AddStudentResponse.builder()
-                .email(savedStudentData.getEmail())
-                .responseCode(ADD_STUDENT_SUCCESS_CODE)
-                .responseMessage(ADD_STUDENT_SUCCESS_MESSAGE)
-                .build();
     }
 
     private boolean checkEmptyRequest(AddStudentRequest addStudentRequest) {

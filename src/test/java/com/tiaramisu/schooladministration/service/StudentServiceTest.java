@@ -11,12 +11,15 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataAccessException;
 
 import java.util.Date;
 
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_STUDENT_BAD_REQUEST_CODE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_STUDENT_ERROR_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_STUDENT_SUCCESS_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_STUDENT_BAD_REQUEST_MESSAGE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_STUDENT_ERROR_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_STUDENT_SUCCESS_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -84,5 +87,20 @@ class StudentServiceTest {
         verifyNoInteractions(studentRepository);
         assertEquals(ADD_STUDENT_BAD_REQUEST_CODE, response.getResponseCode());
         assertEquals(ADD_STUDENT_BAD_REQUEST_MESSAGE, response.getResponseMessage());
+    }
+
+    @Test
+    void addStudent_shouldReturnResponseWithErrorCodeAndMessage_whenStudentRepoThrowsDataAccessException() {
+        final AddStudentRequest request = AddStudentRequest.builder()
+                .email(DUMMY_STUDENT_EMAIL)
+                .name(DUMMY_STUDENT_NAME)
+                .build();
+        when(studentRepository.save(any(Student.class))).thenThrow(new DataAccessException("") {
+        });
+
+        final AddStudentResponse response = studentService.addStudent(request);
+
+        assertEquals(ADD_STUDENT_ERROR_CODE, response.getResponseCode());
+        assertEquals(ADD_STUDENT_ERROR_MESSAGE, response.getResponseMessage());
     }
 }
