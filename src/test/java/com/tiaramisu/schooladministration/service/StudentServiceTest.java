@@ -18,7 +18,7 @@ import java.util.Date;
 
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_STUDENT_ERROR_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_STUDENT_INVALID_REQUEST_CODE;
-import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_STUDENT_SUCCESS_CODE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_USER_SUCCESS_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_STUDENT_DUPLICATE_ENTRY_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_STUDENT_GENERIC_ERROR_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_STUDENT_INVALID_REQUEST_MESSAGE;
@@ -59,7 +59,7 @@ class StudentServiceTest {
         Student toBeSavedStudentData = studentArgumentCaptor.getValue();
         assertEquals(DUMMY_STUDENT_EMAIL, toBeSavedStudentData.getEmail());
         assertEquals(DUMMY_STUDENT_NAME, toBeSavedStudentData.getName());
-        assertEquals(ADD_STUDENT_SUCCESS_CODE, response.getResponseCode());
+        assertEquals(ADD_USER_SUCCESS_CODE, response.getResponseCode());
         assertEquals(ADD_STUDENT_SUCCESS_MESSAGE, response.getResponseMessage());
     }
 

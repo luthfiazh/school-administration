@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_STUDENT_INVALID_REQUEST_CODE;
-import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_STUDENT_SUCCESS_CODE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_USER_SUCCESS_CODE;
 
 @RestController
 @RequestMapping("api")
@@ -23,7 +23,7 @@ public class StudentController {
     @PostMapping(value = "/students", produces = "application/json", consumes = "application/json")
     public ResponseEntity<AddStudentResponse> add(@RequestBody AddStudentRequest addStudentRequest) {
         final AddStudentResponse response = studentService.addStudent(addStudentRequest);
-        final boolean isRequestSuccessful = response.getResponseCode().equals(ADD_STUDENT_SUCCESS_CODE);
+        final boolean isRequestSuccessful = response.getResponseCode().equals(ADD_USER_SUCCESS_CODE);
         if (isRequestSuccessful) {
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         }

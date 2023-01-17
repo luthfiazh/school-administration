@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 public class Constant {
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     public static class ResponseCode {
-        public static final String ADD_STUDENT_SUCCESS_CODE = "201";
+        public static final String ADD_USER_SUCCESS_CODE = "201";
         public static final String ADD_STUDENT_INVALID_REQUEST_CODE = "400";
         public static final String ADD_STUDENT_ERROR_CODE = "500";
     }
@@ -15,6 +15,7 @@ public class Constant {
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     public static class ResponseMessage {
         public static final String ADD_STUDENT_SUCCESS_MESSAGE = "Successfully registered a student";
+        public static final String ADD_TEACHER_SUCCESS_MESSAGE = "Successfully registered a teacher";
         public static final String ADD_STUDENT_INVALID_REQUEST_MESSAGE = "Email and name should not be empty";
         public static final String ADD_STUDENT_DUPLICATE_ENTRY_MESSAGE = "Student with provided email already exists";
         public static final String ADD_STUDENT_GENERIC_ERROR_MESSAGE = "Error occurred. Please contact developer";

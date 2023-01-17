@@ -15,7 +15,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_STUDENT_ERROR_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_STUDENT_INVALID_REQUEST_CODE;
-import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_STUDENT_SUCCESS_CODE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_USER_SUCCESS_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_STUDENT_GENERIC_ERROR_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_STUDENT_INVALID_REQUEST_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_STUDENT_SUCCESS_MESSAGE;
@@ -45,7 +45,7 @@ class StudentControllerTest {
                 .build();
         final AddStudentResponse response = AddStudentResponse.builder()
                 .email(DUMMY_STUDENT_EMAIL)
-                .responseCode(ADD_STUDENT_SUCCESS_CODE)
+                .responseCode(ADD_USER_SUCCESS_CODE)
                 .responseMessage(ADD_STUDENT_SUCCESS_MESSAGE)
                 .build();
         when(studentService.addStudent(request)).thenReturn(response);
