@@ -2,6 +2,10 @@ package com.tiaramisu.schooladministration.controller;
 
 import com.tiaramisu.schooladministration.model.AddUserRequest;
 import com.tiaramisu.schooladministration.model.AddUserResponse;
+import com.tiaramisu.schooladministration.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,9 +14,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("api")
+@RequiredArgsConstructor
 public class TeacherController {
+    @Qualifier(value = "TeacherServiceImpl")
+    private final UserService teacherService;
+
     @PostMapping(value = "/teachers", produces = "application/json", consumes = "application/json")
     public ResponseEntity<AddUserResponse> add(@RequestBody AddUserRequest addTeacherRequest) {
-        return null;
+        final AddUserResponse response = teacherService.addUser(addTeacherRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }
