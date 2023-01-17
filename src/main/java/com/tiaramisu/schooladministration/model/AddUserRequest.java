@@ -1,11 +1,11 @@
-package com.tiaramisu.schooladministration.model.teacher;
+package com.tiaramisu.schooladministration.model;
 
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-public class AddTeacherRequest {
+public class AddUserRequest {
     private String email;
     private String name;
 }

@@ -1,8 +1,8 @@
 package com.tiaramisu.schooladministration.service;
 
 import com.tiaramisu.schooladministration.entity.Student;
-import com.tiaramisu.schooladministration.model.AddStudentRequest;
-import com.tiaramisu.schooladministration.model.AddStudentResponse;
+import com.tiaramisu.schooladministration.model.AddUserRequest;
+import com.tiaramisu.schooladministration.model.AddUserResponse;
 import com.tiaramisu.schooladministration.repository.StudentRepository;
 import com.tiaramisu.schooladministration.service.impl.StudentServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -40,7 +40,7 @@ class StudentServiceTest {
 
     @Test
     void addStudent_shouldSaveDataAndReturnResponseWithSuccessMessage_whenGivenStudentEmailAndName() {
-        final AddStudentRequest request = AddStudentRequest.builder()
+        final AddUserRequest request = AddUserRequest.builder()
                 .email(DUMMY_STUDENT_EMAIL)
                 .name(DUMMY_STUDENT_NAME)
                 .build();
@@ -53,7 +53,7 @@ class StudentServiceTest {
         ArgumentCaptor<Student> studentArgumentCaptor = ArgumentCaptor.forClass(Student.class);
         when(studentRepository.save(any(Student.class))).thenReturn(actualSavedStudentData);
 
-        final AddStudentResponse response = studentService.addStudent(request);
+        final AddUserResponse response = studentService.addUser(request);
 
         verify(studentRepository).save(studentArgumentCaptor.capture());
         Student toBeSavedStudentData = studentArgumentCaptor.getValue();
@@ -66,12 +66,12 @@ class StudentServiceTest {
     @Test
     void addStudent_shouldReturnResponseWithErrorCodeAndMessage_whenGivenEmptyStudentEmail() {
         final String EMPTY = "";
-        final AddStudentRequest request = AddStudentRequest.builder()
+        final AddUserRequest request = AddUserRequest.builder()
                 .email(EMPTY)
                 .name(DUMMY_STUDENT_NAME)
                 .build();
 
-        final AddStudentResponse response = studentService.addStudent(request);
+        final AddUserResponse response = studentService.addUser(request);
 
         verifyNoInteractions(studentRepository);
         assertEquals(ADD_STUDENT_INVALID_REQUEST_CODE, response.getResponseCode());
@@ -80,11 +80,11 @@ class StudentServiceTest {
 
     @Test
     void addStudent_shouldReturnResponseWithErrorCodeAndMessage_whenGivenNullStudentName() {
-        final AddStudentRequest request = AddStudentRequest.builder()
+        final AddUserRequest request = AddUserRequest.builder()
                 .email(DUMMY_STUDENT_EMAIL)
                 .build();
 
-        final AddStudentResponse response = studentService.addStudent(request);
+        final AddUserResponse response = studentService.addUser(request);
 
         verifyNoInteractions(studentRepository);
         assertEquals(ADD_STUDENT_INVALID_REQUEST_CODE, response.getResponseCode());
@@ -93,14 +93,14 @@ class StudentServiceTest {
 
     @Test
     void addStudent_shouldReturnResponseWithErrorCodeAndMessage_whenStudentRepoThrowsDataAccessException() {
-        final AddStudentRequest request = AddStudentRequest.builder()
+        final AddUserRequest request = AddUserRequest.builder()
                 .email(DUMMY_STUDENT_EMAIL)
                 .name(DUMMY_STUDENT_NAME)
                 .build();
         when(studentRepository.save(any(Student.class))).thenThrow(new DataAccessException("") {
         });
 
-        final AddStudentResponse response = studentService.addStudent(request);
+        final AddUserResponse response = studentService.addUser(request);
 
         assertEquals(ADD_STUDENT_ERROR_CODE, response.getResponseCode());
         assertEquals(ADD_STUDENT_GENERIC_ERROR_MESSAGE, response.getResponseMessage());
@@ -108,14 +108,14 @@ class StudentServiceTest {
 
     @Test
     void addStudent_shouldReturnResponseWitDuplicateEntryErrorCodeAndMessage_whenStudentRepoThrowsDataIntegrityViolationExceptionDueToDuplicateEntry() {
-        final AddStudentRequest request = AddStudentRequest.builder()
+        final AddUserRequest request = AddUserRequest.builder()
                 .email(DUMMY_STUDENT_EMAIL)
                 .name(DUMMY_STUDENT_NAME)
                 .build();
         when(studentRepository.save(any(Student.class))).thenThrow(new DataIntegrityViolationException("") {
         });
 
-        final AddStudentResponse response = studentService.addStudent(request);
+        final AddUserResponse response = studentService.addUser(request);
 
         assertEquals(ADD_STUDENT_INVALID_REQUEST_CODE, response.getResponseCode());
         assertEquals(ADD_STUDENT_DUPLICATE_ENTRY_MESSAGE, response.getResponseMessage());

@@ -1,10 +1,10 @@
 package com.tiaramisu.schooladministration.service.impl;
 
 import com.tiaramisu.schooladministration.entity.Teacher;
-import com.tiaramisu.schooladministration.model.teacher.AddTeacherRequest;
-import com.tiaramisu.schooladministration.model.teacher.AddTeacherResponse;
+import com.tiaramisu.schooladministration.model.AddUserRequest;
+import com.tiaramisu.schooladministration.model.AddUserResponse;
 import com.tiaramisu.schooladministration.repository.TeacherRepository;
-import com.tiaramisu.schooladministration.service.TeacherService;
+import com.tiaramisu.schooladministration.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,11 +15,11 @@ import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessag
 
 @Service
 @RequiredArgsConstructor
-public class TeacherServiceImpl implements TeacherService {
+public class TeacherServiceImpl implements UserService {
     private final TeacherRepository teacherRepository;
 
     @Override
-    public AddTeacherResponse addTeacher(AddTeacherRequest addTeacherRequest) {
+    public AddUserResponse addUser(AddUserRequest addTeacherRequest) {
         final Teacher teacherToBeSaved = Teacher.builder()
                 .email(addTeacherRequest.getEmail())
                 .name(addTeacherRequest.getName())
@@ -27,7 +27,7 @@ public class TeacherServiceImpl implements TeacherService {
                 .modifiedDate(new Date())
                 .build();
         final Teacher savedTeacher = teacherRepository.save(teacherToBeSaved);
-        return AddTeacherResponse.builder()
+        return AddUserResponse.builder()
                 .email(savedTeacher.getEmail())
                 .responseCode(ADD_USER_SUCCESS_CODE)
                 .responseMessage(ADD_TEACHER_SUCCESS_MESSAGE)

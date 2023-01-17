@@ -1,8 +1,8 @@
 package com.tiaramisu.schooladministration.controller;
 
-import com.tiaramisu.schooladministration.model.AddStudentRequest;
-import com.tiaramisu.schooladministration.model.AddStudentResponse;
-import com.tiaramisu.schooladministration.service.StudentService;
+import com.tiaramisu.schooladministration.model.AddUserRequest;
+import com.tiaramisu.schooladministration.model.AddUserResponse;
+import com.tiaramisu.schooladministration.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,11 +18,11 @@ import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.A
 @RequestMapping("api")
 @RequiredArgsConstructor
 public class StudentController {
-    private final StudentService studentService;
+    private final UserService studentService;
 
     @PostMapping(value = "/students", produces = "application/json", consumes = "application/json")
-    public ResponseEntity<AddStudentResponse> add(@RequestBody AddStudentRequest addStudentRequest) {
-        final AddStudentResponse response = studentService.addStudent(addStudentRequest);
+    public ResponseEntity<AddUserResponse> add(@RequestBody AddUserRequest addStudentRequest) {
+        final AddUserResponse response = studentService.addUser(addStudentRequest);
         final boolean isRequestSuccessful = response.getResponseCode().equals(ADD_USER_SUCCESS_CODE);
         if (isRequestSuccessful) {
             return ResponseEntity.status(HttpStatus.CREATED).body(response);

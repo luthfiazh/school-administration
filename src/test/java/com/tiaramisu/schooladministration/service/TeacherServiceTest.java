@@ -1,8 +1,8 @@
 package com.tiaramisu.schooladministration.service;
 
 import com.tiaramisu.schooladministration.entity.Teacher;
-import com.tiaramisu.schooladministration.model.teacher.AddTeacherRequest;
-import com.tiaramisu.schooladministration.model.teacher.AddTeacherResponse;
+import com.tiaramisu.schooladministration.model.AddUserRequest;
+import com.tiaramisu.schooladministration.model.AddUserResponse;
 import com.tiaramisu.schooladministration.repository.TeacherRepository;
 import com.tiaramisu.schooladministration.service.impl.TeacherServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -32,7 +32,7 @@ class TeacherServiceTest {
 
     @Test
     void addTeacher_shouldReturnSuccessResponseMessage_whenGivenValidEmailAndName() {
-        final AddTeacherRequest request = AddTeacherRequest.builder()
+        final AddUserRequest request = AddUserRequest.builder()
                 .email(DUMMY_EMAIL)
                 .name(DUMMY_NAME)
                 .build();
@@ -45,7 +45,7 @@ class TeacherServiceTest {
         when(teacherRepository.save(any(Teacher.class))).thenReturn(actualSavedTeacher);
         ArgumentCaptor<Teacher> teacherArgumentCaptor = ArgumentCaptor.forClass(Teacher.class);
 
-        final AddTeacherResponse response = teacherService.addTeacher(request);
+        final AddUserResponse response = teacherService.addUser(request);
 
         verify(teacherRepository).save(teacherArgumentCaptor.capture());
         Teacher toBeSavedTeacherData = teacherArgumentCaptor.getValue();

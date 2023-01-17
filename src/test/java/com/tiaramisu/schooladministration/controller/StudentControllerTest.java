@@ -1,9 +1,9 @@
 package com.tiaramisu.schooladministration.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tiaramisu.schooladministration.model.AddStudentRequest;
-import com.tiaramisu.schooladministration.model.AddStudentResponse;
-import com.tiaramisu.schooladministration.service.StudentService;
+import com.tiaramisu.schooladministration.model.AddUserRequest;
+import com.tiaramisu.schooladministration.model.AddUserResponse;
+import com.tiaramisu.schooladministration.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -31,7 +31,7 @@ class StudentControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private StudentService studentService;
+    private UserService studentService;
 
     final String DUMMY_STUDENT_EMAIL = "student@school.com";
     final String DUMMY_STUDENT_NAME = "Johnny Doe";
@@ -39,16 +39,16 @@ class StudentControllerTest {
     @Test
     void add_shouldReturnHttpStatusCreatedAndExpectedResponseBody_whenGivenAppropriateRequestBody() throws Exception {
         final String ENDPOINT_URI = "/api/students";
-        final AddStudentRequest request = AddStudentRequest.builder()
+        final AddUserRequest request = AddUserRequest.builder()
                 .email(DUMMY_STUDENT_EMAIL)
                 .name(DUMMY_STUDENT_NAME)
                 .build();
-        final AddStudentResponse response = AddStudentResponse.builder()
+        final AddUserResponse response = AddUserResponse.builder()
                 .email(DUMMY_STUDENT_EMAIL)
                 .responseCode(ADD_USER_SUCCESS_CODE)
                 .responseMessage(ADD_STUDENT_SUCCESS_MESSAGE)
                 .build();
-        when(studentService.addStudent(request)).thenReturn(response);
+        when(studentService.addUser(request)).thenReturn(response);
         final String requestInJson = new ObjectMapper().writeValueAsString(request);
         final String expectedResponseInJson = new ObjectMapper().writeValueAsString(response);
 
@@ -64,14 +64,14 @@ class StudentControllerTest {
     @Test
     void add_shouldReturnHttpStatusNotAcceptableAndExpectedResponseBody_whenGivenRequestBodyWithNoEmail() throws Exception {
         final String ENDPOINT_URI = "/api/students";
-        final AddStudentRequest request = AddStudentRequest.builder()
+        final AddUserRequest request = AddUserRequest.builder()
                 .name(DUMMY_STUDENT_NAME)
                 .build();
-        final AddStudentResponse response = AddStudentResponse.builder()
+        final AddUserResponse response = AddUserResponse.builder()
                 .responseCode(ADD_STUDENT_INVALID_REQUEST_CODE)
                 .responseMessage(ADD_STUDENT_INVALID_REQUEST_MESSAGE)
                 .build();
-        when(studentService.addStudent(request)).thenReturn(response);
+        when(studentService.addUser(request)).thenReturn(response);
         final String requestInJson = new ObjectMapper().writeValueAsString(request);
         final String expectedResponseInJson = new ObjectMapper().writeValueAsString(response);
 
@@ -87,14 +87,14 @@ class StudentControllerTest {
     @Test
     void add_shouldReturnHttpStatusInternalServerErrorAndExpectedResponseBody_whenServiceMethodReturnsWithResponseCodeNot201Or400() throws Exception {
         final String ENDPOINT_URI = "/api/students";
-        final AddStudentRequest request = AddStudentRequest.builder()
+        final AddUserRequest request = AddUserRequest.builder()
                 .name(DUMMY_STUDENT_NAME)
                 .build();
-        final AddStudentResponse response = AddStudentResponse.builder()
+        final AddUserResponse response = AddUserResponse.builder()
                 .responseCode(ADD_STUDENT_ERROR_CODE)
                 .responseMessage(ADD_STUDENT_GENERIC_ERROR_MESSAGE)
                 .build();
-        when(studentService.addStudent(request)).thenReturn(response);
+        when(studentService.addUser(request)).thenReturn(response);
         final String requestInJson = new ObjectMapper().writeValueAsString(request);
         final String expectedResponseInJson = new ObjectMapper().writeValueAsString(response);
 
