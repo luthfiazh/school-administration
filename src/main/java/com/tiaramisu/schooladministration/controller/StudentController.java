@@ -4,6 +4,7 @@ import com.tiaramisu.schooladministration.model.AddUserRequest;
 import com.tiaramisu.schooladministration.model.AddUserResponse;
 import com.tiaramisu.schooladministration.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +19,7 @@ import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.A
 @RequestMapping("api")
 @RequiredArgsConstructor
 public class StudentController {
+    @Qualifier(value = "StudentServiceImpl")
     private final UserService studentService;
 
     @PostMapping(value = "/students", produces = "application/json", consumes = "application/json")
