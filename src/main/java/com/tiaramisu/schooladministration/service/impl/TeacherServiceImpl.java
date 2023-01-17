@@ -55,6 +55,7 @@ public class TeacherServiceImpl implements UserService {
                     .build();
         } catch (DataAccessException dataAccessException) {
             return AddUserResponse.builder()
+                    .email(addTeacherRequest.getEmail())
                     .responseCode(ADD_USER_GENERIC_ERROR_CODE)
                     .responseMessage(ADD_USER_GENERIC_ERROR_MESSAGE)
                     .build();
