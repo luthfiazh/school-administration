@@ -14,11 +14,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_STUDENT_ERROR_CODE;
-import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_STUDENT_INVALID_REQUEST_CODE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_USER_INVALID_REQUEST_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_USER_SUCCESS_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_STUDENT_GENERIC_ERROR_MESSAGE;
-import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_STUDENT_INVALID_REQUEST_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_STUDENT_SUCCESS_MESSAGE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_USER_INVALID_REQUEST_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -27,14 +27,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(StudentController.class)
 @ContextConfiguration(classes = {StudentController.class})
 class StudentControllerTest {
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
-    private UserService studentService;
-
     final String DUMMY_STUDENT_EMAIL = "student@school.com";
     final String DUMMY_STUDENT_NAME = "Johnny Doe";
+    @Autowired
+    private MockMvc mockMvc;
+    @MockBean
+    private UserService studentService;
 
     @Test
     void add_shouldReturnHttpStatusCreatedAndExpectedResponseBody_whenGivenAppropriateRequestBody() throws Exception {
@@ -68,8 +66,8 @@ class StudentControllerTest {
                 .name(DUMMY_STUDENT_NAME)
                 .build();
         final AddUserResponse response = AddUserResponse.builder()
-                .responseCode(ADD_STUDENT_INVALID_REQUEST_CODE)
-                .responseMessage(ADD_STUDENT_INVALID_REQUEST_MESSAGE)
+                .responseCode(ADD_USER_INVALID_REQUEST_CODE)
+                .responseMessage(ADD_USER_INVALID_REQUEST_MESSAGE)
                 .build();
         when(studentService.addUser(request)).thenReturn(response);
         final String requestInJson = new ObjectMapper().writeValueAsString(request);

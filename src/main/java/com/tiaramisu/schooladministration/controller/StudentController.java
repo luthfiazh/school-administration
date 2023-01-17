@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_STUDENT_INVALID_REQUEST_CODE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_USER_INVALID_REQUEST_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_USER_SUCCESS_CODE;
 
 @RestController
@@ -27,7 +27,7 @@ public class StudentController {
         if (isRequestSuccessful) {
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         }
-        final boolean isRequestInvalid = response.getResponseCode().equals(ADD_STUDENT_INVALID_REQUEST_CODE);
+        final boolean isRequestInvalid = response.getResponseCode().equals(ADD_USER_INVALID_REQUEST_CODE);
         if (isRequestInvalid) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(response);
         }

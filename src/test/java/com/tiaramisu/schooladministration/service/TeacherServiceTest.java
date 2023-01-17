@@ -14,11 +14,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Date;
 
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_USER_INVALID_REQUEST_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_USER_SUCCESS_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_TEACHER_SUCCESS_MESSAGE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_USER_INVALID_REQUEST_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,7 +34,7 @@ class TeacherServiceTest {
     private TeacherServiceImpl teacherService;
 
     @Test
-    void addTeacher_shouldReturnSuccessResponseMessage_whenGivenValidEmailAndName() {
+    void addUser_shouldReturnSuccessResponseMessage_whenGivenValidEmailAndName() {
         final AddUserRequest request = AddUserRequest.builder()
                 .email(DUMMY_EMAIL)
                 .name(DUMMY_NAME)
@@ -53,5 +56,33 @@ class TeacherServiceTest {
         assertEquals(DUMMY_NAME, toBeSavedTeacherData.getName());
         assertEquals(ADD_USER_SUCCESS_CODE, response.getResponseCode());
         assertEquals(ADD_TEACHER_SUCCESS_MESSAGE, response.getResponseMessage());
+    }
+
+    @Test
+    void addUser_shouldReturnInvalidRequestAndMakeNoInteractionWithRepository_whenGivenEmptyEmailInRequest() {
+        final String EMPTY = "";
+        final AddUserRequest request = AddUserRequest.builder()
+                .email(EMPTY)
+                .name(DUMMY_NAME)
+                .build();
+
+        final AddUserResponse response = teacherService.addUser(request);
+
+        verifyNoInteractions(teacherRepository);
+        assertEquals(ADD_USER_INVALID_REQUEST_CODE, response.getResponseCode());
+        assertEquals(ADD_USER_INVALID_REQUEST_MESSAGE, response.getResponseMessage());
+    }
+
+    @Test
+    void addUser_shouldReturnInvalidRequestAndMakeNoInteractionWithRepository_whenGivenNullNameInRequest() {
+        final AddUserRequest request = AddUserRequest.builder()
+                .email(DUMMY_EMAIL)
+                .build();
+
+        final AddUserResponse response = teacherService.addUser(request);
+
+        verifyNoInteractions(teacherRepository);
+        assertEquals(ADD_USER_INVALID_REQUEST_CODE, response.getResponseCode());
+        assertEquals(ADD_USER_INVALID_REQUEST_MESSAGE, response.getResponseMessage());
     }
 }
