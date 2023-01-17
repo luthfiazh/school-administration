@@ -13,10 +13,10 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_STUDENT_ERROR_CODE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_USER_GENERIC_ERROR_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_USER_INVALID_REQUEST_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_USER_SUCCESS_CODE;
-import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_STUDENT_GENERIC_ERROR_MESSAGE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_USER_GENERIC_ERROR_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_STUDENT_SUCCESS_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_USER_INVALID_REQUEST_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -89,8 +89,8 @@ class StudentControllerTest {
                 .name(DUMMY_STUDENT_NAME)
                 .build();
         final AddUserResponse response = AddUserResponse.builder()
-                .responseCode(ADD_STUDENT_ERROR_CODE)
-                .responseMessage(ADD_STUDENT_GENERIC_ERROR_MESSAGE)
+                .responseCode(ADD_USER_GENERIC_ERROR_CODE)
+                .responseMessage(ADD_USER_GENERIC_ERROR_MESSAGE)
                 .build();
         when(studentService.addUser(request)).thenReturn(response);
         final String requestInJson = new ObjectMapper().writeValueAsString(request);

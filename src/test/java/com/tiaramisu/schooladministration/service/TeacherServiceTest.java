@@ -11,12 +11,17 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.Date;
 
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_USER_GENERIC_ERROR_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_USER_INVALID_REQUEST_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_USER_SUCCESS_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_TEACHER_SUCCESS_MESSAGE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_USER_DUPLICATE_ENTRY_MESSAGE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_USER_GENERIC_ERROR_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_USER_INVALID_REQUEST_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -84,5 +89,35 @@ class TeacherServiceTest {
         verifyNoInteractions(teacherRepository);
         assertEquals(ADD_USER_INVALID_REQUEST_CODE, response.getResponseCode());
         assertEquals(ADD_USER_INVALID_REQUEST_MESSAGE, response.getResponseMessage());
+    }
+
+    @Test
+    void addUser_shouldReturnGenericErrorResponse_whenRepositoryThrowsDataAccessException() {
+        final AddUserRequest request = AddUserRequest.builder()
+                .email(DUMMY_EMAIL)
+                .name(DUMMY_NAME)
+                .build();
+        when(teacherRepository.save(any(Teacher.class))).thenThrow(new DataAccessException("") {
+        });
+
+        final AddUserResponse response = teacherService.addUser(request);
+
+        assertEquals(ADD_USER_GENERIC_ERROR_CODE, response.getResponseCode());
+        assertEquals(ADD_USER_GENERIC_ERROR_MESSAGE, response.getResponseMessage());
+    }
+
+    @Test
+    void addUser_shouldReturnDuplicateEntryResponse_whenRepositoryThrowsDataIntegrityViolationExceptionDueToDuplicateEntry() {
+        final AddUserRequest request = AddUserRequest.builder()
+                .email(DUMMY_EMAIL)
+                .name(DUMMY_NAME)
+                .build();
+        when(teacherRepository.save(any(Teacher.class))).thenThrow(new DataIntegrityViolationException("") {
+        });
+
+        final AddUserResponse response = teacherService.addUser(request);
+
+        assertEquals(ADD_USER_INVALID_REQUEST_CODE, response.getResponseCode());
+        assertEquals(ADD_USER_DUPLICATE_ENTRY_MESSAGE, response.getResponseMessage());
     }
 }
