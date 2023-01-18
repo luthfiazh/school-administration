@@ -53,7 +53,7 @@ class StudentServiceTest {
         ArgumentCaptor<Student> studentArgumentCaptor = ArgumentCaptor.forClass(Student.class);
         when(studentRepository.save(any(Student.class))).thenReturn(actualSavedStudentData);
 
-        final AddUserResponse response = studentService.addUser(request);
+        final AddUserResponse response = studentService.addStudent(request);
 
         verify(studentRepository).save(studentArgumentCaptor.capture());
         Student toBeSavedStudentData = studentArgumentCaptor.getValue();
@@ -71,7 +71,7 @@ class StudentServiceTest {
                 .name(DUMMY_STUDENT_NAME)
                 .build();
 
-        final AddUserResponse response = studentService.addUser(request);
+        final AddUserResponse response = studentService.addStudent(request);
 
         verifyNoInteractions(studentRepository);
         assertEquals(ADD_USER_INVALID_REQUEST_CODE, response.getResponseCode());
@@ -84,7 +84,7 @@ class StudentServiceTest {
                 .email(DUMMY_STUDENT_EMAIL)
                 .build();
 
-        final AddUserResponse response = studentService.addUser(request);
+        final AddUserResponse response = studentService.addStudent(request);
 
         verifyNoInteractions(studentRepository);
         assertEquals(ADD_USER_INVALID_REQUEST_CODE, response.getResponseCode());
@@ -100,7 +100,7 @@ class StudentServiceTest {
         when(studentRepository.save(any(Student.class))).thenThrow(new DataAccessException("") {
         });
 
-        final AddUserResponse response = studentService.addUser(request);
+        final AddUserResponse response = studentService.addStudent(request);
 
         assertEquals(ADD_USER_GENERIC_ERROR_CODE, response.getResponseCode());
         assertEquals(ADD_USER_GENERIC_ERROR_MESSAGE, response.getResponseMessage());
@@ -115,7 +115,7 @@ class StudentServiceTest {
         when(studentRepository.save(any(Student.class))).thenThrow(new DataIntegrityViolationException("") {
         });
 
-        final AddUserResponse response = studentService.addUser(request);
+        final AddUserResponse response = studentService.addStudent(request);
 
         assertEquals(ADD_USER_INVALID_REQUEST_CODE, response.getResponseCode());
         assertEquals(ADD_USER_DUPLICATE_ENTRY_MESSAGE, response.getResponseMessage());

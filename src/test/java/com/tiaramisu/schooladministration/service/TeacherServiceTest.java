@@ -53,7 +53,7 @@ class TeacherServiceTest {
         when(teacherRepository.save(any(Teacher.class))).thenReturn(actualSavedTeacher);
         ArgumentCaptor<Teacher> teacherArgumentCaptor = ArgumentCaptor.forClass(Teacher.class);
 
-        final AddUserResponse response = teacherService.addUser(request);
+        final AddUserResponse response = teacherService.addTeacher(request);
 
         verify(teacherRepository).save(teacherArgumentCaptor.capture());
         Teacher toBeSavedTeacherData = teacherArgumentCaptor.getValue();
@@ -71,7 +71,7 @@ class TeacherServiceTest {
                 .name(DUMMY_NAME)
                 .build();
 
-        final AddUserResponse response = teacherService.addUser(request);
+        final AddUserResponse response = teacherService.addTeacher(request);
 
         verifyNoInteractions(teacherRepository);
         assertEquals(ADD_USER_INVALID_REQUEST_CODE, response.getResponseCode());
@@ -84,7 +84,7 @@ class TeacherServiceTest {
                 .email(DUMMY_EMAIL)
                 .build();
 
-        final AddUserResponse response = teacherService.addUser(request);
+        final AddUserResponse response = teacherService.addTeacher(request);
 
         verifyNoInteractions(teacherRepository);
         assertEquals(ADD_USER_INVALID_REQUEST_CODE, response.getResponseCode());
@@ -100,7 +100,7 @@ class TeacherServiceTest {
         when(teacherRepository.save(any(Teacher.class))).thenThrow(new DataAccessException("") {
         });
 
-        final AddUserResponse response = teacherService.addUser(request);
+        final AddUserResponse response = teacherService.addTeacher(request);
 
         assertEquals(ADD_USER_GENERIC_ERROR_CODE, response.getResponseCode());
         assertEquals(ADD_USER_GENERIC_ERROR_MESSAGE, response.getResponseMessage());
@@ -115,7 +115,7 @@ class TeacherServiceTest {
         when(teacherRepository.save(any(Teacher.class))).thenThrow(new DataIntegrityViolationException("") {
         });
 
-        final AddUserResponse response = teacherService.addUser(request);
+        final AddUserResponse response = teacherService.addTeacher(request);
 
         assertEquals(ADD_USER_INVALID_REQUEST_CODE, response.getResponseCode());
         assertEquals(ADD_USER_DUPLICATE_ENTRY_MESSAGE, response.getResponseMessage());

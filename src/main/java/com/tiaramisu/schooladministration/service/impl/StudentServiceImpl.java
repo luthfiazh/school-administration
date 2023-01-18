@@ -4,7 +4,7 @@ import com.tiaramisu.schooladministration.entity.Student;
 import com.tiaramisu.schooladministration.model.AddUserRequest;
 import com.tiaramisu.schooladministration.model.AddUserResponse;
 import com.tiaramisu.schooladministration.repository.StudentRepository;
-import com.tiaramisu.schooladministration.service.UserService;
+import com.tiaramisu.schooladministration.service.StudentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -23,11 +23,11 @@ import static com.tiaramisu.schooladministration.utility.Constant.checkEmptyRequ
 
 @Service
 @RequiredArgsConstructor
-public class StudentServiceImpl implements UserService {
+public class StudentServiceImpl implements StudentService {
     private final StudentRepository studentRepository;
 
     @Override
-    public AddUserResponse addUser(AddUserRequest addStudentRequest) {
+    public AddUserResponse addStudent(AddUserRequest addStudentRequest) {
         try {
             if (checkEmptyRequest(addStudentRequest)) {
                 return AddUserResponse.builder()

@@ -3,10 +3,9 @@ package com.tiaramisu.schooladministration.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tiaramisu.schooladministration.model.AddUserRequest;
 import com.tiaramisu.schooladministration.model.AddUserResponse;
-import com.tiaramisu.schooladministration.service.UserService;
+import com.tiaramisu.schooladministration.service.impl.StudentServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -33,12 +32,11 @@ class StudentControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @MockBean
-    @Qualifier(value = "StudentServiceImpl")
-    private UserService studentService;
+    private StudentServiceImpl studentService;
 
     @Test
     void add_shouldReturnHttpStatusCreatedAndExpectedResponseBody_whenGivenAppropriateRequestBody() throws Exception {
-        final String ENDPOINT_URI = "/api/students";
+        final String ENDPOINT_URI = "/students";
         final AddUserRequest request = AddUserRequest.builder()
                 .email(DUMMY_STUDENT_EMAIL)
                 .name(DUMMY_STUDENT_NAME)
@@ -48,7 +46,7 @@ class StudentControllerTest {
                 .responseCode(ADD_USER_SUCCESS_CODE)
                 .responseMessage(ADD_STUDENT_SUCCESS_MESSAGE)
                 .build();
-        when(studentService.addUser(request)).thenReturn(response);
+        when(studentService.addStudent(request)).thenReturn(response);
         final String requestInJson = new ObjectMapper().writeValueAsString(request);
         final String expectedResponseInJson = new ObjectMapper().writeValueAsString(response);
 
@@ -63,7 +61,7 @@ class StudentControllerTest {
 
     @Test
     void add_shouldReturnHttpStatusNotAcceptableAndExpectedResponseBody_whenGivenRequestBodyWithNoEmail() throws Exception {
-        final String ENDPOINT_URI = "/api/students";
+        final String ENDPOINT_URI = "/students";
         final AddUserRequest request = AddUserRequest.builder()
                 .name(DUMMY_STUDENT_NAME)
                 .build();
@@ -71,7 +69,7 @@ class StudentControllerTest {
                 .responseCode(ADD_USER_INVALID_REQUEST_CODE)
                 .responseMessage(ADD_USER_INVALID_REQUEST_MESSAGE)
                 .build();
-        when(studentService.addUser(request)).thenReturn(response);
+        when(studentService.addStudent(request)).thenReturn(response);
         final String requestInJson = new ObjectMapper().writeValueAsString(request);
         final String expectedResponseInJson = new ObjectMapper().writeValueAsString(response);
 
@@ -86,7 +84,7 @@ class StudentControllerTest {
 
     @Test
     void add_shouldReturnHttpStatusInternalServerErrorAndExpectedResponseBody_whenServiceMethodReturnsWithResponseCodeNot201Or400() throws Exception {
-        final String ENDPOINT_URI = "/api/students";
+        final String ENDPOINT_URI = "/students";
         final AddUserRequest request = AddUserRequest.builder()
                 .name(DUMMY_STUDENT_NAME)
                 .build();
@@ -94,7 +92,7 @@ class StudentControllerTest {
                 .responseCode(ADD_USER_GENERIC_ERROR_CODE)
                 .responseMessage(ADD_USER_GENERIC_ERROR_MESSAGE)
                 .build();
-        when(studentService.addUser(request)).thenReturn(response);
+        when(studentService.addStudent(request)).thenReturn(response);
         final String requestInJson = new ObjectMapper().writeValueAsString(request);
         final String expectedResponseInJson = new ObjectMapper().writeValueAsString(response);
 
