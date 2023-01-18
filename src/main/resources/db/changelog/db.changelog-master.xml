@@ -6,4 +6,5 @@
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.3.xsd">
     <include file="db/changelog/DEV-STORY-01/db.changelog-initial_students_table.xml"/>
     <include file="db/changelog/DEV-STORY-02/db.changelog-initial_teachers_table.xml"/>
+    <include file="db/changelog/DEV-STORY-03/db.changelog-initial_enrollments_table.xml"/>
 </databaseChangeLog>
