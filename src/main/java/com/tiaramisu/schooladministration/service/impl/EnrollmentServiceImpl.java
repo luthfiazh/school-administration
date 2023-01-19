@@ -46,6 +46,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     private final RevocationRepository revocationRepository;
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public EnrollmentResponse enrollStudent(EnrollmentRequest enrollmentRequest) {
         if (checkEmptyEnrollmentRequest(enrollmentRequest)) {
             return EnrollmentResponse.builder()
