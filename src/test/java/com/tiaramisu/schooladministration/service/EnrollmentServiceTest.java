@@ -23,10 +23,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataAccessException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ENROLLMENT_INVALID_REQUEST_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ENROLLMENT_SUCCESS_CODE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ENROLLMENT_USER_NOT_FOUND_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.GENERIC_ERROR_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.REVOKE_ENROLLMENT_INVALID_REQUEST_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.REVOKE_ENROLLMENT_NOTHING_TO_REVOKE_CODE;
@@ -34,6 +36,7 @@ import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.R
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.REVOKE_ENROLLMENT_USER_NOT_FOUND_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ENROLLMENT_INVALID_REQUEST_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ENROLLMENT_SUCCESS_MESSAGE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ENROLLMENT_USER_NOT_FOUND_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.GENERIC_ERROR_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.REVOKE_ENROLLMENT_INVALID_REQUEST_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.REVOKE_ENROLLMENT_NOTHING_TO_REVOKE_MESSAGE;
@@ -145,6 +148,27 @@ class EnrollmentServiceTest {
         final EnrollmentResponse expectedResponse = EnrollmentResponse.builder()
                 .responseCode(ENROLLMENT_INVALID_REQUEST_CODE)
                 .responseMessage(ENROLLMENT_INVALID_REQUEST_MESSAGE)
+                .build();
+
+        EnrollmentResponse response = enrollmentService.enrollStudent(request);
+
+        assertEquals(expectedResponse, response);
+    }
+
+    @Test
+    void enrollStudent_shouldReturnUserNotFound_whenTeacherOrStudentsAreNonexistent() {
+        List<String> studentEmails = new ArrayList<>();
+        studentEmails.add(JANE_STUDENT_EMAIL);
+        studentEmails.add(JOHN_STUDENT_EMAIL);
+        EnrollmentRequest request = EnrollmentRequest.builder()
+                .teacher(TEACHER_EMAIL)
+                .students(studentEmails)
+                .build();
+        when(teacherRepository.findByEmail(TEACHER_EMAIL)).thenReturn(null);
+        when(studentRepository.findAllByEmailIn(studentEmails)).thenReturn(Collections.emptyList());
+        final EnrollmentResponse expectedResponse = EnrollmentResponse.builder()
+                .responseCode(ENROLLMENT_USER_NOT_FOUND_CODE)
+                .responseMessage(ENROLLMENT_USER_NOT_FOUND_MESSAGE)
                 .build();
 
         EnrollmentResponse response = enrollmentService.enrollStudent(request);

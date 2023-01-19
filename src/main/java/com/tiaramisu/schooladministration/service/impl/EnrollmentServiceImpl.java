@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ENROLLMENT_INVALID_REQUEST_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ENROLLMENT_SUCCESS_CODE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ENROLLMENT_USER_NOT_FOUND_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.GENERIC_ERROR_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.REVOKE_ENROLLMENT_INVALID_REQUEST_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.REVOKE_ENROLLMENT_NOTHING_TO_REVOKE_CODE;
@@ -33,6 +34,7 @@ import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.R
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.REVOKE_ENROLLMENT_USER_NOT_FOUND_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ENROLLMENT_INVALID_REQUEST_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ENROLLMENT_SUCCESS_MESSAGE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ENROLLMENT_USER_NOT_FOUND_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.GENERIC_ERROR_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.REVOKE_ENROLLMENT_INVALID_REQUEST_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.REVOKE_ENROLLMENT_NOTHING_TO_REVOKE_MESSAGE;
@@ -59,6 +61,14 @@ public class EnrollmentServiceImpl implements EnrollmentService {
             }
             Teacher fetchedTeacher = teacherRepository.findByEmail(enrollmentRequest.getTeacher());
             List<Student> fetchedStudents = studentRepository.findAllByEmailIn(enrollmentRequest.getStudents());
+            final boolean isTeacherNonexistent = fetchedTeacher == null;
+            final boolean areStudentsNonexistent = fetchedStudents.isEmpty();
+            if (isTeacherNonexistent || areStudentsNonexistent) {
+                return EnrollmentResponse.builder()
+                        .responseCode(ENROLLMENT_USER_NOT_FOUND_CODE)
+                        .responseMessage(ENROLLMENT_USER_NOT_FOUND_MESSAGE)
+                        .build();
+            }
             List<String> studentIds = fetchedStudents.stream()
                     .map(Student::getStudentId)
                     .collect(Collectors.toList());

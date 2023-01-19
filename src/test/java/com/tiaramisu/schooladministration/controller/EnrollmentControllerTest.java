@@ -15,9 +15,11 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ENROLLMENT_INVALID_REQUEST_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ENROLLMENT_SUCCESS_CODE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ENROLLMENT_USER_NOT_FOUND_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.GENERIC_ERROR_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ENROLLMENT_INVALID_REQUEST_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ENROLLMENT_SUCCESS_MESSAGE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ENROLLMENT_USER_NOT_FOUND_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.GENERIC_ERROR_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
@@ -77,6 +79,26 @@ class EnrollmentControllerTest {
                 .andReturn();
 
         verify(enrollmentService).enrollStudent(request);
+        assertEquals(responseInJson, result.getResponse().getContentAsString());
+    }
+
+    @Test
+    void register_shouldReturnHttpNotFound_whenUserIsNonexistent() throws Exception {
+        final EnrollmentRequest request = EnrollmentRequest.builder().build();
+        final EnrollmentResponse response = EnrollmentResponse.builder()
+                .responseCode(ENROLLMENT_USER_NOT_FOUND_CODE)
+                .responseMessage(ENROLLMENT_USER_NOT_FOUND_MESSAGE)
+                .build();
+        final String requestInJson = new ObjectMapper().writeValueAsString(request);
+        final String responseInJson = new ObjectMapper().writeValueAsString(response);
+        when(enrollmentService.enrollStudent(request)).thenReturn(response);
+
+        MvcResult result = mockMvc.perform(post(ENDPOINT_URI)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestInJson))
+                .andExpect(status().isNotFound())
+                .andReturn();
+
         assertEquals(responseInJson, result.getResponse().getContentAsString());
     }
 
