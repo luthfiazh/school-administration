@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ENROLLMENT_SUCCESS_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ENROLLMENT_SUCCESS_MESSAGE;
@@ -30,7 +31,13 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     public EnrollmentResponse enrollStudent(EnrollmentRequest enrollmentRequest) {
         Teacher fetchedTeacher = teacherRepository.findByEmail(enrollmentRequest.getTeacher());
         List<Student> fetchedStudents = studentRepository.findAllByEmailIn(enrollmentRequest.getStudents());
-        List<Enrollment> enrollments = new ArrayList<>();
+        List<String> studentIds = fetchedStudents.stream()
+                .map(Student::getStudentId)
+                .collect(Collectors.toList());
+        List<Enrollment> existingEnrollments = enrollmentRepository.findAllByTeacherIdAndStudentIdIn(
+                fetchedTeacher.getTeacherId(),
+                studentIds);
+        List<Enrollment> enrollmentsToBeSaved = new ArrayList<>();
         fetchedStudents.forEach(student -> {
             final Enrollment enrollment = Enrollment.builder()
                     .teacherId(fetchedTeacher.getTeacherId())
@@ -38,9 +45,10 @@ public class EnrollmentServiceImpl implements EnrollmentService {
                     .createdDate(new Date())
                     .modifiedDate(new Date())
                     .build();
-            enrollments.add(enrollment);
+            enrollmentsToBeSaved.add(enrollment);
         });
-        enrollmentRepository.saveAll(enrollments);
+        enrollmentsToBeSaved.removeAll(existingEnrollments);
+        enrollmentRepository.saveAll(enrollmentsToBeSaved);
         return EnrollmentResponse.builder()
                 .responseCode(ENROLLMENT_SUCCESS_CODE)
                 .responseMessage(ENROLLMENT_SUCCESS_MESSAGE)

@@ -12,6 +12,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Date;
+import java.util.Objects;
 
 @Data
 @Table(name = "enrollments")
@@ -31,4 +32,17 @@ public class Enrollment {
     private String studentId;
     private Date createdDate;
     private Date modifiedDate;
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        Enrollment that = (Enrollment) object;
+        return teacherId.equals(that.teacherId) && studentId.equals(that.studentId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(teacherId, studentId);
+    }
 }
