@@ -5,6 +5,8 @@ import com.tiaramisu.schooladministration.entity.Student;
 import com.tiaramisu.schooladministration.entity.Teacher;
 import com.tiaramisu.schooladministration.model.EnrollmentRequest;
 import com.tiaramisu.schooladministration.model.EnrollmentResponse;
+import com.tiaramisu.schooladministration.model.RevokeEnrollmentRequest;
+import com.tiaramisu.schooladministration.model.RevokeEnrollmentResponse;
 import com.tiaramisu.schooladministration.repository.EnrollmentRepository;
 import com.tiaramisu.schooladministration.repository.StudentRepository;
 import com.tiaramisu.schooladministration.repository.TeacherRepository;
@@ -25,6 +27,7 @@ import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.E
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ENROLLMENT_INVALID_REQUEST_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ENROLLMENT_SUCCESS_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.atMostOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -129,5 +132,14 @@ class EnrollmentServiceTest {
         EnrollmentResponse response = enrollmentService.enrollStudent(request);
 
         assertEquals(EXPECTED_RESPONSE, response);
+    }
+
+    @Test
+    void revokeEnrollment_shouldReturnNull_whenGivenRequest() {
+        RevokeEnrollmentRequest request = RevokeEnrollmentRequest.builder().build();
+
+        RevokeEnrollmentResponse response = enrollmentService.revokeEnrollment(request);
+
+        assertNull(response);
     }
 }

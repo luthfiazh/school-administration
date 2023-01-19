@@ -5,6 +5,8 @@ import com.tiaramisu.schooladministration.entity.Student;
 import com.tiaramisu.schooladministration.entity.Teacher;
 import com.tiaramisu.schooladministration.model.EnrollmentRequest;
 import com.tiaramisu.schooladministration.model.EnrollmentResponse;
+import com.tiaramisu.schooladministration.model.RevokeEnrollmentRequest;
+import com.tiaramisu.schooladministration.model.RevokeEnrollmentResponse;
 import com.tiaramisu.schooladministration.repository.EnrollmentRepository;
 import com.tiaramisu.schooladministration.repository.StudentRepository;
 import com.tiaramisu.schooladministration.repository.TeacherRepository;
@@ -54,6 +56,11 @@ public class EnrollmentServiceImpl implements EnrollmentService {
                 .build();
     }
 
+    @Override
+    public RevokeEnrollmentResponse revokeEnrollment(RevokeEnrollmentRequest revokeEnrollmentRequest) {
+        return null;
+    }
+
     private List<Enrollment> getValidEnrollments(Teacher fetchedTeacher, List<Student> fetchedStudents, List<Enrollment> existingEnrollments) {
         List<Enrollment> enrollmentsToBeSaved = new ArrayList<>();
         fetchedStudents.forEach(student -> {
@@ -72,4 +79,6 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     private boolean checkEmptyEnrollmentRequest(EnrollmentRequest enrollmentRequest) {
         return enrollmentRequest == null || StringUtils.isEmpty(enrollmentRequest.getTeacher());
     }
+
+
 }
