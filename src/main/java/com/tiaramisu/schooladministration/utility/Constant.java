@@ -20,6 +20,8 @@ public class Constant {
         public static final String ENROLLMENT_INVALID_REQUEST_CODE = "400";
         public static final String ADD_USER_GENERIC_ERROR_CODE = "500";
         public static final String ENROLLMENT_SUCCESS_CODE = "204";
+        public static final String REVOKE_ENROLLMENT_SUCCESS_CODE = "200";
+        public static final String REVOKE_ENROLLMENT_NOTHING_TO_REVOKE_CODE = "200";
     }
 
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -31,5 +33,7 @@ public class Constant {
         public static final String ADD_USER_GENERIC_ERROR_MESSAGE = "Error occurred. Please contact developer";
         public static final String ENROLLMENT_SUCCESS_MESSAGE = "Successfully enrolled";
         public static final String ENROLLMENT_INVALID_REQUEST_MESSAGE = "Teacher email cannot be null or empty";
+        public static final String REVOKE_ENROLLMENT_SUCCESS_MESSAGE = "Successfully revoked enrollment";
+        public static final String REVOKE_ENROLLMENT_NOTHING_TO_REVOKE_MESSAGE = "No enrollments to revoke with these emails";
     }
 }

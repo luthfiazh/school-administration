@@ -7,4 +7,8 @@ import java.util.List;
 
 public interface EnrollmentRepository extends JpaRepository<Enrollment, String> {
     List<Enrollment> findAllByTeacherIdAndStudentIdIn(String teacherId, List<String> studentId);
+
+    Enrollment findByTeacherIdAndStudentId(String teacherId, String studentId);
+
+    long deleteByTeacherIdAndStudentId(String teacherId, String studentId);
 }
