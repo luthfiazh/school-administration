@@ -2,6 +2,8 @@ package com.tiaramisu.schooladministration.controller;
 
 import com.tiaramisu.schooladministration.model.EnrollmentRequest;
 import com.tiaramisu.schooladministration.model.EnrollmentResponse;
+import com.tiaramisu.schooladministration.model.RevokeEnrollmentRequest;
+import com.tiaramisu.schooladministration.model.RevokeEnrollmentResponse;
 import com.tiaramisu.schooladministration.service.EnrollmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -35,5 +37,11 @@ public class EnrollmentController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(enrollmentResponse);
         }
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(enrollmentResponse);
+    }
+
+    @PostMapping(value = "/deregister", produces = "application/json", consumes = "application/json")
+    public ResponseEntity<RevokeEnrollmentResponse> deregister(@RequestBody RevokeEnrollmentRequest revokeEnrollmentRequest) {
+        RevokeEnrollmentResponse revokeEnrollmentResponse = enrollmentService.revokeEnrollment(revokeEnrollmentRequest);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(revokeEnrollmentResponse);
     }
 }

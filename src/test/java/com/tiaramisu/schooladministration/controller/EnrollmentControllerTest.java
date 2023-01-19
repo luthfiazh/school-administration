@@ -3,6 +3,8 @@ package com.tiaramisu.schooladministration.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tiaramisu.schooladministration.model.EnrollmentRequest;
 import com.tiaramisu.schooladministration.model.EnrollmentResponse;
+import com.tiaramisu.schooladministration.model.RevokeEnrollmentRequest;
+import com.tiaramisu.schooladministration.model.RevokeEnrollmentResponse;
 import com.tiaramisu.schooladministration.service.impl.EnrollmentServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,20 +19,30 @@ import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.E
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ENROLLMENT_SUCCESS_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ENROLLMENT_USER_NOT_FOUND_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.GENERIC_ERROR_CODE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.REVOKE_ENROLLMENT_INVALID_REQUEST_CODE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.REVOKE_ENROLLMENT_NOTHING_TO_REVOKE_CODE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.REVOKE_ENROLLMENT_SUCCESS_CODE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.REVOKE_ENROLLMENT_USER_NOT_FOUND_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ENROLLMENT_INVALID_REQUEST_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ENROLLMENT_SUCCESS_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ENROLLMENT_USER_NOT_FOUND_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.GENERIC_ERROR_MESSAGE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.REVOKE_ENROLLMENT_INVALID_REQUEST_MESSAGE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.REVOKE_ENROLLMENT_NOTHING_TO_REVOKE_MESSAGE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.REVOKE_ENROLLMENT_SUCCESS_MESSAGE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.REVOKE_ENROLLMENT_USER_NOT_FOUND_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+
 @WebMvcTest(EnrollmentController.class)
 @ContextConfiguration(classes = {EnrollmentController.class})
 class EnrollmentControllerTest {
-    final String ENDPOINT_URI = "/register";
+    final String REGISTER_ENDPOINT_URI = "/register";
+    final String DEREGISTER_ENDPOINT_URI = "/deregister";
     @Autowired
     private MockMvc mockMvc;
 
@@ -51,7 +63,7 @@ class EnrollmentControllerTest {
         final String responseInJson = new ObjectMapper().writeValueAsString(response);
         when(enrollmentService.enrollStudent(request)).thenReturn(response);
 
-        MvcResult result = mockMvc.perform(post(ENDPOINT_URI)
+        MvcResult result = mockMvc.perform(post(REGISTER_ENDPOINT_URI)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestInJson))
                 .andExpect(status().isNoContent())
@@ -72,7 +84,7 @@ class EnrollmentControllerTest {
         final String responseInJson = new ObjectMapper().writeValueAsString(response);
         when(enrollmentService.enrollStudent(request)).thenReturn(response);
 
-        MvcResult result = mockMvc.perform(post(ENDPOINT_URI)
+        MvcResult result = mockMvc.perform(post(REGISTER_ENDPOINT_URI)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestInJson))
                 .andExpect(status().isBadRequest())
@@ -93,7 +105,7 @@ class EnrollmentControllerTest {
         final String responseInJson = new ObjectMapper().writeValueAsString(response);
         when(enrollmentService.enrollStudent(request)).thenReturn(response);
 
-        MvcResult result = mockMvc.perform(post(ENDPOINT_URI)
+        MvcResult result = mockMvc.perform(post(REGISTER_ENDPOINT_URI)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestInJson))
                 .andExpect(status().isNotFound())
@@ -113,10 +125,30 @@ class EnrollmentControllerTest {
         final String responseInJson = new ObjectMapper().writeValueAsString(response);
         when(enrollmentService.enrollStudent(request)).thenReturn(response);
 
-        MvcResult result = mockMvc.perform(post(ENDPOINT_URI)
+        MvcResult result = mockMvc.perform(post(REGISTER_ENDPOINT_URI)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestInJson))
                 .andExpect(status().isInternalServerError())
+                .andReturn();
+
+        assertEquals(responseInJson, result.getResponse().getContentAsString());
+    }
+
+    @Test
+    void deregister_shouldReturnBadRequest_whenTeacherOrStudentEmailIsInvalid() throws Exception {
+        final RevokeEnrollmentRequest request = RevokeEnrollmentRequest.builder().build();
+        final RevokeEnrollmentResponse response = RevokeEnrollmentResponse.builder()
+                .responseCode(REVOKE_ENROLLMENT_INVALID_REQUEST_CODE)
+                .responseMessage(REVOKE_ENROLLMENT_INVALID_REQUEST_MESSAGE)
+                .build();
+        final String requestInJson = new ObjectMapper().writeValueAsString(request);
+        final String responseInJson = new ObjectMapper().writeValueAsString(response);
+        when(enrollmentService.revokeEnrollment(request)).thenReturn(response);
+
+        MvcResult result = mockMvc.perform(post(DEREGISTER_ENDPOINT_URI)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestInJson))
+                .andExpect(status().isBadRequest())
                 .andReturn();
 
         assertEquals(responseInJson, result.getResponse().getContentAsString());
