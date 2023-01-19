@@ -153,4 +153,98 @@ class EnrollmentControllerTest {
 
         assertEquals(responseInJson, result.getResponse().getContentAsString());
     }
+
+    @Test
+    void deregister_shouldReturnNotFound_whenTeacherOrStudentIsNonexistent() throws Exception {
+        final RevokeEnrollmentRequest request = RevokeEnrollmentRequest.builder().build();
+        final RevokeEnrollmentResponse response = RevokeEnrollmentResponse.builder()
+                .responseCode(REVOKE_ENROLLMENT_USER_NOT_FOUND_CODE)
+                .responseMessage(REVOKE_ENROLLMENT_USER_NOT_FOUND_MESSAGE)
+                .build();
+        final String requestInJson = new ObjectMapper().writeValueAsString(request);
+        final String responseInJson = new ObjectMapper().writeValueAsString(response);
+        when(enrollmentService.revokeEnrollment(request)).thenReturn(response);
+
+        MvcResult result = mockMvc.perform(post(DEREGISTER_ENDPOINT_URI)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestInJson))
+                .andExpect(status().isNotFound())
+                .andReturn();
+
+        assertEquals(responseInJson, result.getResponse().getContentAsString());
+    }
+
+    @Test
+    void deregister_shouldReturnInternalServerError_whenMethodEncountersError() throws Exception {
+        final RevokeEnrollmentRequest request = RevokeEnrollmentRequest.builder().build();
+        final RevokeEnrollmentResponse response = RevokeEnrollmentResponse.builder()
+                .responseCode(GENERIC_ERROR_CODE)
+                .responseMessage(GENERIC_ERROR_MESSAGE)
+                .build();
+        final String requestInJson = new ObjectMapper().writeValueAsString(request);
+        final String responseInJson = new ObjectMapper().writeValueAsString(response);
+        when(enrollmentService.revokeEnrollment(request)).thenReturn(response);
+
+        MvcResult result = mockMvc.perform(post(DEREGISTER_ENDPOINT_URI)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestInJson))
+                .andExpect(status().isInternalServerError())
+                .andReturn();
+
+        assertEquals(responseInJson, result.getResponse().getContentAsString());
+    }
+
+    @Test
+    void deregister_shouldReturnOK_whenGivenAppropriateRequest() throws Exception {
+        final String REASON = "Student no longer wish to enroll";
+        final String TEACHER_EMAIL = "teacher@email.com";
+        final String STUDENT_EMAIL = "student@email.com";
+        final RevokeEnrollmentRequest request = RevokeEnrollmentRequest.builder()
+                .teacher(TEACHER_EMAIL)
+                .student(STUDENT_EMAIL)
+                .reason(REASON)
+                .build();
+        final RevokeEnrollmentResponse response = RevokeEnrollmentResponse.builder()
+                .responseCode(REVOKE_ENROLLMENT_SUCCESS_CODE)
+                .responseMessage(REVOKE_ENROLLMENT_SUCCESS_MESSAGE)
+                .build();
+        final String requestInJson = new ObjectMapper().writeValueAsString(request);
+        final String responseInJson = new ObjectMapper().writeValueAsString(response);
+        when(enrollmentService.revokeEnrollment(request)).thenReturn(response);
+
+        MvcResult result = mockMvc.perform(post(DEREGISTER_ENDPOINT_URI)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestInJson))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        assertEquals(responseInJson, result.getResponse().getContentAsString());
+    }
+
+    @Test
+    void deregister_shouldReturnOKWithNothingToRevokeMessage_whenGivenAppropriateRequestButNothingToRevoke() throws Exception {
+        final String REASON = "Student no longer wish to enroll";
+        final String TEACHER_EMAIL = "teacher@email.com";
+        final String STUDENT_EMAIL = "student@email.com";
+        final RevokeEnrollmentRequest request = RevokeEnrollmentRequest.builder()
+                .teacher(TEACHER_EMAIL)
+                .student(STUDENT_EMAIL)
+                .reason(REASON)
+                .build();
+        final RevokeEnrollmentResponse response = RevokeEnrollmentResponse.builder()
+                .responseCode(REVOKE_ENROLLMENT_NOTHING_TO_REVOKE_CODE)
+                .responseMessage(REVOKE_ENROLLMENT_NOTHING_TO_REVOKE_MESSAGE)
+                .build();
+        final String requestInJson = new ObjectMapper().writeValueAsString(request);
+        final String responseInJson = new ObjectMapper().writeValueAsString(response);
+        when(enrollmentService.revokeEnrollment(request)).thenReturn(response);
+
+        MvcResult result = mockMvc.perform(post(DEREGISTER_ENDPOINT_URI)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestInJson))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        assertEquals(responseInJson, result.getResponse().getContentAsString());
+    }
 }

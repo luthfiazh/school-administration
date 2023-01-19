@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ENROLLMENT_INVALID_REQUEST_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ENROLLMENT_USER_NOT_FOUND_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.GENERIC_ERROR_CODE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.REVOKE_ENROLLMENT_INVALID_REQUEST_CODE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.REVOKE_ENROLLMENT_USER_NOT_FOUND_CODE;
 
 @RestController
 @RequiredArgsConstructor
@@ -42,6 +44,18 @@ public class EnrollmentController {
     @PostMapping(value = "/deregister", produces = "application/json", consumes = "application/json")
     public ResponseEntity<RevokeEnrollmentResponse> deregister(@RequestBody RevokeEnrollmentRequest revokeEnrollmentRequest) {
         RevokeEnrollmentResponse revokeEnrollmentResponse = enrollmentService.revokeEnrollment(revokeEnrollmentRequest);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(revokeEnrollmentResponse);
+        final boolean isRequestInvalid = revokeEnrollmentResponse.getResponseCode().equals(REVOKE_ENROLLMENT_INVALID_REQUEST_CODE);
+        if (isRequestInvalid) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(revokeEnrollmentResponse);
+        }
+        final boolean isUserNotFound = revokeEnrollmentResponse.getResponseCode().equals(REVOKE_ENROLLMENT_USER_NOT_FOUND_CODE);
+        if (isUserNotFound) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(revokeEnrollmentResponse);
+        }
+        final boolean isMetWithError = revokeEnrollmentResponse.getResponseCode().equals(GENERIC_ERROR_CODE);
+        if (isMetWithError) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(revokeEnrollmentResponse);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(revokeEnrollmentResponse);
     }
 }
