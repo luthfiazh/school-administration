@@ -29,6 +29,12 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class EnrollmentServiceTest {
+    private final String JANE_STUDENT_EMAIL = "jane@student.com";
+    private final String JOHN_STUDENT_EMAIL = "john@student.com";
+    private final String TEACHER_EMAIL = "teacher@email.com";
+    final String TEACHER_ID = "teacherId001";
+    final String JANE_STUDENT_ID = "studentId001";
+    final String JOHN_STUDENT_ID = "studentId002";
     @Captor
     ArgumentCaptor<List<Enrollment>> enrollmentsArgumentCaptor;
     @Mock
@@ -42,21 +48,15 @@ class EnrollmentServiceTest {
 
     @Test
     void enrollStudent_shouldReturnSuccessEnrollment_whenGivenAppropriateRequest() {
-        final String JANE_STUDENT_EMAIL = "jane@student.com";
-        final String JOHN_STUDENT_EMAIL = "john@student.com";
         List<String> studentEmails = new ArrayList<>();
         studentEmails.add(JANE_STUDENT_EMAIL);
         studentEmails.add(JOHN_STUDENT_EMAIL);
-        final String TEACHER_EMAIL = "teacher@email.com";
         EnrollmentRequest request = EnrollmentRequest.builder()
                 .teacher(TEACHER_EMAIL)
                 .students(studentEmails)
                 .build();
-        final String TEACHER_ID = "teacherId001";
         final Teacher teacher = Teacher.builder().teacherId(TEACHER_ID).build();
-        final String JANE_STUDENT_ID = "studentId001";
         Student jane = Student.builder().studentId(JANE_STUDENT_ID).build();
-        final String JOHN_STUDENT_ID = "studentId002";
         Student john = Student.builder().studentId(JOHN_STUDENT_ID).build();
         List<Student> students = new ArrayList<>();
         students.add(jane);
@@ -78,23 +78,17 @@ class EnrollmentServiceTest {
 
     @Test
     void enrollStudent_shouldOnlyEnroll2OutOf3Students_when1StudentIsAlreadyEnrolledWithAGivenTeacher() {
-        final String JANE_STUDENT_EMAIL = "jane@student.com";
-        final String JOHN_STUDENT_EMAIL = "john@student.com";
         final String JIMMY_STUDENT_EMAIL = "jimmy@student.com";
         List<String> studentEmails = new ArrayList<>();
         studentEmails.add(JANE_STUDENT_EMAIL);
         studentEmails.add(JOHN_STUDENT_EMAIL);
         studentEmails.add(JIMMY_STUDENT_EMAIL);
-        final String TEACHER_EMAIL = "teacher@email.com";
         EnrollmentRequest request = EnrollmentRequest.builder()
                 .teacher(TEACHER_EMAIL)
                 .students(studentEmails)
                 .build();
-        final String TEACHER_ID = "teacherId001";
         final Teacher teacher = Teacher.builder().teacherId(TEACHER_ID).build();
-        final String JANE_STUDENT_ID = "studentId001";
         Student jane = Student.builder().studentId(JANE_STUDENT_ID).build();
-        final String JOHN_STUDENT_ID = "studentId002";
         Student john = Student.builder().studentId(JOHN_STUDENT_ID).build();
         final String JIMMY_STUDENT_ID = "studentId003";
         Student jimmy = Student.builder().studentId(JIMMY_STUDENT_ID).build();
