@@ -19,7 +19,7 @@ import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessag
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_USER_GENERIC_ERROR_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_STUDENT_SUCCESS_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_USER_INVALID_REQUEST_MESSAGE;
-import static com.tiaramisu.schooladministration.utility.Constant.checkEmptyRequest;
+import static com.tiaramisu.schooladministration.utility.Generic.checkEmptyUserRequest;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +29,7 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public AddUserResponse addStudent(AddUserRequest addStudentRequest) {
         try {
-            if (checkEmptyRequest(addStudentRequest)) {
+            if (checkEmptyUserRequest(addStudentRequest)) {
                 return AddUserResponse.builder()
                         .responseCode(ADD_USER_INVALID_REQUEST_CODE)
                         .responseMessage(ADD_USER_INVALID_REQUEST_MESSAGE)
