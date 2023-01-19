@@ -63,12 +63,12 @@ class EnrollmentServiceTest {
         students.add(jane);
         students.add(john);
         when(teacherRepository.findByEmail(TEACHER_EMAIL)).thenReturn(teacher);
-        when(studentRepository.findAllByEmail(studentEmails)).thenReturn(students);
+        when(studentRepository.findAllByEmailIn(studentEmails)).thenReturn(students);
 
         EnrollmentResponse response = enrollmentService.enrollStudent(request);
 
         verify(teacherRepository, atMostOnce()).findByEmail(TEACHER_EMAIL);
-        verify(studentRepository, atMostOnce()).findAllByEmail(studentEmails);
+        verify(studentRepository, atMostOnce()).findAllByEmailIn(studentEmails);
         verify(enrollmentRepository, atMostOnce()).saveAll(enrollmentsArgumentCaptor.capture());
         List<Enrollment> capturedEnrollments = enrollmentsArgumentCaptor.getValue();
         assertEquals(TEACHER_ID, capturedEnrollments.get(0).getTeacherId());

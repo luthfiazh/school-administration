@@ -29,7 +29,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     @Override
     public EnrollmentResponse enrollStudent(EnrollmentRequest enrollmentRequest) {
         Teacher fetchedTeacher = teacherRepository.findByEmail(enrollmentRequest.getTeacher());
-        List<Student> fetchedStudents = studentRepository.findAllByEmail(enrollmentRequest.getStudents());
+        List<Student> fetchedStudents = studentRepository.findAllByEmailIn(enrollmentRequest.getStudents());
         List<Enrollment> enrollments = new ArrayList<>();
         fetchedStudents.forEach(student -> {
             final Enrollment enrollment = Enrollment.builder()

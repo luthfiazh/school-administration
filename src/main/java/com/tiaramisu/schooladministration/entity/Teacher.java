@@ -3,6 +3,7 @@ package com.tiaramisu.schooladministration.entity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Column;
@@ -16,6 +17,7 @@ import java.util.Date;
 @Table(name = "teachers")
 @Entity
 @Builder
+@NoArgsConstructor
 @AllArgsConstructor
 public class Teacher {
     @Id
