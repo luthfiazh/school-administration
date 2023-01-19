@@ -26,12 +26,16 @@ import java.util.stream.Collectors;
 
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ENROLLMENT_INVALID_REQUEST_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ENROLLMENT_SUCCESS_CODE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.REVOKE_ENROLLMENT_INVALID_REQUEST_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.REVOKE_ENROLLMENT_NOTHING_TO_REVOKE_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.REVOKE_ENROLLMENT_SUCCESS_CODE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.REVOKE_ENROLLMENT_USER_NOT_FOUND_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ENROLLMENT_INVALID_REQUEST_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ENROLLMENT_SUCCESS_MESSAGE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.REVOKE_ENROLLMENT_INVALID_REQUEST_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.REVOKE_ENROLLMENT_NOTHING_TO_REVOKE_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.REVOKE_ENROLLMENT_SUCCESS_MESSAGE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.REVOKE_ENROLLMENT_USER_NOT_FOUND_MESSAGE;
 
 @Service
 @RequiredArgsConstructor
@@ -68,8 +72,20 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public RevokeEnrollmentResponse revokeEnrollment(RevokeEnrollmentRequest revokeEnrollmentRequest) {
+        if (checkEmptyEmails(revokeEnrollmentRequest)) {
+            return RevokeEnrollmentResponse.builder()
+                    .responseCode(REVOKE_ENROLLMENT_INVALID_REQUEST_CODE)
+                    .responseMessage(REVOKE_ENROLLMENT_INVALID_REQUEST_MESSAGE)
+                    .build();
+        }
         final Teacher fetchedTeacher = teacherRepository.findByEmail(revokeEnrollmentRequest.getTeacher());
         final Student fetchedStudent = studentRepository.findByEmail(revokeEnrollmentRequest.getStudent());
+        if (checkNonexistentUser(fetchedTeacher, fetchedStudent)) {
+            return RevokeEnrollmentResponse.builder()
+                    .responseCode(REVOKE_ENROLLMENT_USER_NOT_FOUND_CODE)
+                    .responseMessage(REVOKE_ENROLLMENT_USER_NOT_FOUND_MESSAGE)
+                    .build();
+        }
         final Enrollment fetchedExistingEnrollment = enrollmentRepository.findByTeacherIdAndStudentId(
                 fetchedTeacher.getTeacherId(),
                 fetchedStudent.getStudentId());
@@ -87,6 +103,18 @@ public class EnrollmentServiceImpl implements EnrollmentService {
                 .responseCode(REVOKE_ENROLLMENT_NOTHING_TO_REVOKE_CODE)
                 .responseMessage(REVOKE_ENROLLMENT_NOTHING_TO_REVOKE_MESSAGE)
                 .build();
+    }
+
+    private boolean checkNonexistentUser(Teacher fetchedTeacher, Student fetchedStudent) {
+        final boolean teacherNotExists = fetchedTeacher == null;
+        final boolean studentNotExists = fetchedStudent == null;
+        return teacherNotExists || studentNotExists;
+    }
+
+    private boolean checkEmptyEmails(RevokeEnrollmentRequest revokeEnrollmentRequest) {
+        final boolean isTeacherEmailEmpty = StringUtils.isEmpty(revokeEnrollmentRequest.getTeacher());
+        final boolean isStudentEmailEmpty = StringUtils.isEmpty(revokeEnrollmentRequest.getStudent());
+        return isTeacherEmailEmpty || isStudentEmailEmpty;
     }
 
     private void recordEnrollmentRevocation(RevokeEnrollmentRequest revokeEnrollmentRequest, Enrollment fetchedExistingEnrollment) {

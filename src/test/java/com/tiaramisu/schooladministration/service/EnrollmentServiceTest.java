@@ -26,12 +26,16 @@ import java.util.List;
 
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ENROLLMENT_INVALID_REQUEST_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ENROLLMENT_SUCCESS_CODE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.REVOKE_ENROLLMENT_INVALID_REQUEST_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.REVOKE_ENROLLMENT_NOTHING_TO_REVOKE_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.REVOKE_ENROLLMENT_SUCCESS_CODE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.REVOKE_ENROLLMENT_USER_NOT_FOUND_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ENROLLMENT_INVALID_REQUEST_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ENROLLMENT_SUCCESS_MESSAGE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.REVOKE_ENROLLMENT_INVALID_REQUEST_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.REVOKE_ENROLLMENT_NOTHING_TO_REVOKE_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.REVOKE_ENROLLMENT_SUCCESS_MESSAGE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.REVOKE_ENROLLMENT_USER_NOT_FOUND_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.atMostOnce;
 import static org.mockito.Mockito.verify;
@@ -47,6 +51,7 @@ class EnrollmentServiceTest {
     private final String JANE_STUDENT_ID = "studentId001";
     private final String JOHN_STUDENT_ID = "studentId002";
     private final String ENROLLMENT_ID = "enrollmentId01";
+    private final String REASON = "Student no longer wish to enroll";
     @Captor
     ArgumentCaptor<List<Enrollment>> enrollmentsArgumentCaptor;
     @Captor
@@ -146,7 +151,6 @@ class EnrollmentServiceTest {
 
     @Test
     void revokeEnrollment_shouldReturnRevokeEnrollmentSuccess_whenGivenRequestWithEnrollmentEntryToDelete() {
-        final String REASON = "Student no longer wish to enroll";
         RevokeEnrollmentRequest request = RevokeEnrollmentRequest.builder()
                 .teacher(TEACHER_EMAIL)
                 .student(JANE_STUDENT_EMAIL)
@@ -183,7 +187,6 @@ class EnrollmentServiceTest {
 
     @Test
     void revokeEnrollment_shouldReturnNothingToRevokeResponse_whenGivenRequestWithNoEnrollmentEntryToDelete() {
-        final String REASON = "Student no longer wish to enroll";
         RevokeEnrollmentRequest request = RevokeEnrollmentRequest.builder()
                 .teacher(TEACHER_EMAIL)
                 .student(JANE_STUDENT_EMAIL)
@@ -206,6 +209,98 @@ class EnrollmentServiceTest {
 
         RevokeEnrollmentResponse response = enrollmentService.revokeEnrollment(request);
 
+        verifyNoInteractions(revocationRepository);
+        assertEquals(expectedResponse, response);
+    }
+
+    @Test
+    void revokeEnrollment_shouldReturnInvalidRequest_whenGivenRequestWithNoTeacherEmail() {
+        RevokeEnrollmentRequest request = RevokeEnrollmentRequest.builder()
+                .student(JANE_STUDENT_EMAIL)
+                .reason(REASON)
+                .build();
+        final RevokeEnrollmentResponse expectedResponse = RevokeEnrollmentResponse.builder()
+                .responseCode(REVOKE_ENROLLMENT_INVALID_REQUEST_CODE)
+                .responseMessage(REVOKE_ENROLLMENT_INVALID_REQUEST_MESSAGE)
+                .build();
+
+        RevokeEnrollmentResponse response = enrollmentService.revokeEnrollment(request);
+
+        verifyNoInteractions(teacherRepository);
+        verifyNoInteractions(studentRepository);
+        verifyNoInteractions(enrollmentRepository);
+        verifyNoInteractions(revocationRepository);
+        assertEquals(expectedResponse, response);
+    }
+
+    @Test
+    void revokeEnrollment_shouldReturnInvalidRequest_whenGivenRequestWithNoStudentEmail() {
+        RevokeEnrollmentRequest request = RevokeEnrollmentRequest.builder()
+                .teacher(TEACHER_EMAIL)
+                .reason(REASON)
+                .build();
+        final RevokeEnrollmentResponse expectedResponse = RevokeEnrollmentResponse.builder()
+                .responseCode(REVOKE_ENROLLMENT_INVALID_REQUEST_CODE)
+                .responseMessage(REVOKE_ENROLLMENT_INVALID_REQUEST_MESSAGE)
+                .build();
+
+        RevokeEnrollmentResponse response = enrollmentService.revokeEnrollment(request);
+
+        verifyNoInteractions(teacherRepository);
+        verifyNoInteractions(studentRepository);
+        verifyNoInteractions(enrollmentRepository);
+        verifyNoInteractions(revocationRepository);
+        assertEquals(expectedResponse, response);
+    }
+
+    @Test
+    void revokeEnrollment_shouldReturnUserNotFoundResponse_whenGivenRequestWithNonexistentTeacher() {
+        RevokeEnrollmentRequest request = RevokeEnrollmentRequest.builder()
+                .teacher(TEACHER_EMAIL)
+                .student(JANE_STUDENT_EMAIL)
+                .reason(REASON)
+                .build();
+        final RevokeEnrollmentResponse expectedResponse = RevokeEnrollmentResponse.builder()
+                .responseCode(REVOKE_ENROLLMENT_USER_NOT_FOUND_CODE)
+                .responseMessage(REVOKE_ENROLLMENT_USER_NOT_FOUND_MESSAGE)
+                .build();
+        Student student = Student.builder()
+                .studentId(JANE_STUDENT_ID).email(JANE_STUDENT_EMAIL)
+                .build();
+        when(teacherRepository.findByEmail(TEACHER_EMAIL)).thenReturn(null);
+        when(studentRepository.findByEmail(JANE_STUDENT_EMAIL)).thenReturn(student);
+
+        RevokeEnrollmentResponse response = enrollmentService.revokeEnrollment(request);
+
+        verify(teacherRepository, atMostOnce()).findByEmail(TEACHER_EMAIL);
+        verify(studentRepository, atMostOnce()).findByEmail(JANE_STUDENT_EMAIL);
+        verifyNoInteractions(enrollmentRepository);
+        verifyNoInteractions(revocationRepository);
+        assertEquals(expectedResponse, response);
+    }
+
+    @Test
+    void revokeEnrollment_shouldReturnUserNotFoundResponse_whenGivenRequestWithNonexistentStudent() {
+        RevokeEnrollmentRequest request = RevokeEnrollmentRequest.builder()
+                .teacher(TEACHER_EMAIL)
+                .student(JANE_STUDENT_EMAIL)
+                .reason(REASON)
+                .build();
+        Teacher teacherData = Teacher.builder()
+                .teacherId(TEACHER_ID).email(TEACHER_EMAIL)
+                .build();
+        when(teacherRepository.findByEmail(TEACHER_EMAIL)).thenReturn(teacherData);
+        when(studentRepository.findByEmail(JANE_STUDENT_EMAIL)).thenReturn(null);
+        final RevokeEnrollmentResponse expectedResponse = RevokeEnrollmentResponse.builder()
+                .responseCode(REVOKE_ENROLLMENT_USER_NOT_FOUND_CODE)
+                .responseMessage(REVOKE_ENROLLMENT_USER_NOT_FOUND_MESSAGE)
+                .build();
+
+        RevokeEnrollmentResponse response = enrollmentService.revokeEnrollment(request);
+
+        verify(teacherRepository, atMostOnce()).findByEmail(TEACHER_EMAIL);
+        verify(studentRepository, atMostOnce()).findByEmail(JANE_STUDENT_EMAIL);
+        verifyNoInteractions(enrollmentRepository);
         verifyNoInteractions(revocationRepository);
         assertEquals(expectedResponse, response);
     }
