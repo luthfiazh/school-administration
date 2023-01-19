@@ -20,18 +20,21 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataAccessException;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ENROLLMENT_INVALID_REQUEST_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ENROLLMENT_SUCCESS_CODE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.GENERIC_ERROR_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.REVOKE_ENROLLMENT_INVALID_REQUEST_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.REVOKE_ENROLLMENT_NOTHING_TO_REVOKE_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.REVOKE_ENROLLMENT_SUCCESS_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.REVOKE_ENROLLMENT_USER_NOT_FOUND_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ENROLLMENT_INVALID_REQUEST_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ENROLLMENT_SUCCESS_MESSAGE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.GENERIC_ERROR_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.REVOKE_ENROLLMENT_INVALID_REQUEST_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.REVOKE_ENROLLMENT_NOTHING_TO_REVOKE_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.REVOKE_ENROLLMENT_SUCCESS_MESSAGE;
@@ -139,14 +142,14 @@ class EnrollmentServiceTest {
     void enrollStudent_shouldReturnInvalidRequest_whenTeacherEmailIsEmptyOrNull() {
         EnrollmentRequest request = EnrollmentRequest.builder()
                 .build();
-        final EnrollmentResponse EXPECTED_RESPONSE = EnrollmentResponse.builder()
+        final EnrollmentResponse expectedResponse = EnrollmentResponse.builder()
                 .responseCode(ENROLLMENT_INVALID_REQUEST_CODE)
                 .responseMessage(ENROLLMENT_INVALID_REQUEST_MESSAGE)
                 .build();
 
         EnrollmentResponse response = enrollmentService.enrollStudent(request);
 
-        assertEquals(EXPECTED_RESPONSE, response);
+        assertEquals(expectedResponse, response);
     }
 
     @Test
@@ -182,6 +185,23 @@ class EnrollmentServiceTest {
         verify(revocationRepository).save(revocationArgumentCaptor.capture());
         Revocation recordedRevocation = revocationArgumentCaptor.getValue();
         assertEquals(REASON, recordedRevocation.getReason());
+        assertEquals(expectedResponse, response);
+    }
+
+    @Test
+    void enrollStudent_shouldReturnGenericError_whenRepositoryThrowsDataAccessException() {
+        EnrollmentRequest request = EnrollmentRequest.builder()
+                .teacher(TEACHER_EMAIL)
+                .build();
+        final EnrollmentResponse expectedResponse = EnrollmentResponse.builder()
+                .responseCode(GENERIC_ERROR_CODE)
+                .responseMessage(GENERIC_ERROR_MESSAGE)
+                .build();
+        when(teacherRepository.findByEmail(TEACHER_EMAIL)).thenThrow(new DataAccessException("..") {
+        });
+
+        EnrollmentResponse response = enrollmentService.enrollStudent(request);
+
         assertEquals(expectedResponse, response);
     }
 
@@ -302,6 +322,27 @@ class EnrollmentServiceTest {
         verify(studentRepository, atMostOnce()).findByEmail(JANE_STUDENT_EMAIL);
         verifyNoInteractions(enrollmentRepository);
         verifyNoInteractions(revocationRepository);
+        assertEquals(expectedResponse, response);
+    }
+
+    @Test
+    void revokeEnrollment_shouldReturnGenericError_whenRepositoryThrowsDataAccessException() {
+        RevokeEnrollmentRequest request = RevokeEnrollmentRequest.builder()
+                .teacher(TEACHER_EMAIL)
+                .student(JANE_STUDENT_EMAIL)
+                .reason(REASON)
+                .build();
+        when(teacherRepository.findByEmail(TEACHER_EMAIL)).thenThrow(new DataAccessException("") {
+        });
+        final RevokeEnrollmentResponse expectedResponse = RevokeEnrollmentResponse.builder()
+                .responseCode(GENERIC_ERROR_CODE)
+                .responseMessage(GENERIC_ERROR_MESSAGE)
+                .build();
+
+        RevokeEnrollmentResponse response = enrollmentService.revokeEnrollment(request);
+
+        verify(teacherRepository, atMostOnce()).findByEmail(TEACHER_EMAIL);
+        verifyNoInteractions(studentRepository);
         assertEquals(expectedResponse, response);
     }
 }

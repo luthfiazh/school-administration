@@ -6,7 +6,6 @@ import com.tiaramisu.schooladministration.model.AddUserResponse;
 import com.tiaramisu.schooladministration.repository.StudentRepository;
 import com.tiaramisu.schooladministration.service.StudentService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -14,13 +13,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 
-import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_USER_GENERIC_ERROR_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_USER_INVALID_REQUEST_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_USER_SUCCESS_CODE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.GENERIC_ERROR_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_STUDENT_SUCCESS_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_USER_DUPLICATE_ENTRY_MESSAGE;
-import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_USER_GENERIC_ERROR_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_USER_INVALID_REQUEST_MESSAGE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.GENERIC_ERROR_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Generic.checkEmptyUserRequest;
 
 @Service
@@ -56,11 +55,11 @@ public class StudentServiceImpl implements StudentService {
                     .responseCode(ADD_USER_INVALID_REQUEST_CODE)
                     .responseMessage(ADD_USER_DUPLICATE_ENTRY_MESSAGE)
                     .build();
-        } catch (DataAccessException dataAccessException) {
+        } catch (Exception exception) {
             return AddUserResponse.builder()
                     .email(addStudentRequest.getEmail())
-                    .responseCode(ADD_USER_GENERIC_ERROR_CODE)
-                    .responseMessage(ADD_USER_GENERIC_ERROR_MESSAGE)
+                    .responseCode(GENERIC_ERROR_CODE)
+                    .responseMessage(GENERIC_ERROR_MESSAGE)
                     .build();
         }
     }

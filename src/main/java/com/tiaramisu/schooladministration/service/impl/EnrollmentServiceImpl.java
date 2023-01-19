@@ -26,12 +26,14 @@ import java.util.stream.Collectors;
 
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ENROLLMENT_INVALID_REQUEST_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ENROLLMENT_SUCCESS_CODE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.GENERIC_ERROR_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.REVOKE_ENROLLMENT_INVALID_REQUEST_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.REVOKE_ENROLLMENT_NOTHING_TO_REVOKE_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.REVOKE_ENROLLMENT_SUCCESS_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.REVOKE_ENROLLMENT_USER_NOT_FOUND_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ENROLLMENT_INVALID_REQUEST_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ENROLLMENT_SUCCESS_MESSAGE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.GENERIC_ERROR_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.REVOKE_ENROLLMENT_INVALID_REQUEST_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.REVOKE_ENROLLMENT_NOTHING_TO_REVOKE_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.REVOKE_ENROLLMENT_SUCCESS_MESSAGE;
@@ -48,62 +50,76 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public EnrollmentResponse enrollStudent(EnrollmentRequest enrollmentRequest) {
-        if (checkEmptyEnrollmentRequest(enrollmentRequest)) {
+        try {
+            if (checkEmptyEnrollmentRequest(enrollmentRequest)) {
+                return EnrollmentResponse.builder()
+                        .responseCode(ENROLLMENT_INVALID_REQUEST_CODE)
+                        .responseMessage(ENROLLMENT_INVALID_REQUEST_MESSAGE)
+                        .build();
+            }
+            Teacher fetchedTeacher = teacherRepository.findByEmail(enrollmentRequest.getTeacher());
+            List<Student> fetchedStudents = studentRepository.findAllByEmailIn(enrollmentRequest.getStudents());
+            List<String> studentIds = fetchedStudents.stream()
+                    .map(Student::getStudentId)
+                    .collect(Collectors.toList());
+            List<Enrollment> existingEnrollments = enrollmentRepository.findAllByTeacherIdAndStudentIdIn(
+                    fetchedTeacher.getTeacherId(),
+                    studentIds);
+            List<Enrollment> enrollmentsToBeSaved = getValidEnrollments(fetchedTeacher, fetchedStudents, existingEnrollments);
+            enrollmentRepository.saveAll(enrollmentsToBeSaved);
             return EnrollmentResponse.builder()
-                    .responseCode(ENROLLMENT_INVALID_REQUEST_CODE)
-                    .responseMessage(ENROLLMENT_INVALID_REQUEST_MESSAGE)
+                    .responseCode(ENROLLMENT_SUCCESS_CODE)
+                    .responseMessage(ENROLLMENT_SUCCESS_MESSAGE)
+                    .build();
+        } catch (Exception exception) {
+            return EnrollmentResponse.builder()
+                    .responseCode(GENERIC_ERROR_CODE)
+                    .responseMessage(GENERIC_ERROR_MESSAGE)
                     .build();
         }
-        Teacher fetchedTeacher = teacherRepository.findByEmail(enrollmentRequest.getTeacher());
-        List<Student> fetchedStudents = studentRepository.findAllByEmailIn(enrollmentRequest.getStudents());
-        List<String> studentIds = fetchedStudents.stream()
-                .map(Student::getStudentId)
-                .collect(Collectors.toList());
-        List<Enrollment> existingEnrollments = enrollmentRepository.findAllByTeacherIdAndStudentIdIn(
-                fetchedTeacher.getTeacherId(),
-                studentIds);
-        List<Enrollment> enrollmentsToBeSaved = getValidEnrollments(fetchedTeacher, fetchedStudents, existingEnrollments);
-        enrollmentRepository.saveAll(enrollmentsToBeSaved);
-        return EnrollmentResponse.builder()
-                .responseCode(ENROLLMENT_SUCCESS_CODE)
-                .responseMessage(ENROLLMENT_SUCCESS_MESSAGE)
-                .build();
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public RevokeEnrollmentResponse revokeEnrollment(RevokeEnrollmentRequest revokeEnrollmentRequest) {
-        if (checkEmptyEmails(revokeEnrollmentRequest)) {
+        try {
+            if (checkEmptyEmails(revokeEnrollmentRequest)) {
+                return RevokeEnrollmentResponse.builder()
+                        .responseCode(REVOKE_ENROLLMENT_INVALID_REQUEST_CODE)
+                        .responseMessage(REVOKE_ENROLLMENT_INVALID_REQUEST_MESSAGE)
+                        .build();
+            }
+            final Teacher fetchedTeacher = teacherRepository.findByEmail(revokeEnrollmentRequest.getTeacher());
+            final Student fetchedStudent = studentRepository.findByEmail(revokeEnrollmentRequest.getStudent());
+            if (checkNonexistentUser(fetchedTeacher, fetchedStudent)) {
+                return RevokeEnrollmentResponse.builder()
+                        .responseCode(REVOKE_ENROLLMENT_USER_NOT_FOUND_CODE)
+                        .responseMessage(REVOKE_ENROLLMENT_USER_NOT_FOUND_MESSAGE)
+                        .build();
+            }
+            final Enrollment fetchedExistingEnrollment = enrollmentRepository.findByTeacherIdAndStudentId(
+                    fetchedTeacher.getTeacherId(),
+                    fetchedStudent.getStudentId());
+            long numberOfRowsDeleted = enrollmentRepository.deleteByTeacherIdAndStudentId(
+                    fetchedTeacher.getTeacherId(),
+                    fetchedStudent.getStudentId());
+            if (numberOfRowsDeleted > 0) {
+                recordEnrollmentRevocation(revokeEnrollmentRequest, fetchedExistingEnrollment);
+                return RevokeEnrollmentResponse.builder()
+                        .responseCode(REVOKE_ENROLLMENT_SUCCESS_CODE)
+                        .responseMessage(REVOKE_ENROLLMENT_SUCCESS_MESSAGE)
+                        .build();
+            }
             return RevokeEnrollmentResponse.builder()
-                    .responseCode(REVOKE_ENROLLMENT_INVALID_REQUEST_CODE)
-                    .responseMessage(REVOKE_ENROLLMENT_INVALID_REQUEST_MESSAGE)
+                    .responseCode(REVOKE_ENROLLMENT_NOTHING_TO_REVOKE_CODE)
+                    .responseMessage(REVOKE_ENROLLMENT_NOTHING_TO_REVOKE_MESSAGE)
+                    .build();
+        } catch (Exception exception) {
+            return RevokeEnrollmentResponse.builder()
+                    .responseCode(GENERIC_ERROR_CODE)
+                    .responseMessage(GENERIC_ERROR_MESSAGE)
                     .build();
         }
-        final Teacher fetchedTeacher = teacherRepository.findByEmail(revokeEnrollmentRequest.getTeacher());
-        final Student fetchedStudent = studentRepository.findByEmail(revokeEnrollmentRequest.getStudent());
-        if (checkNonexistentUser(fetchedTeacher, fetchedStudent)) {
-            return RevokeEnrollmentResponse.builder()
-                    .responseCode(REVOKE_ENROLLMENT_USER_NOT_FOUND_CODE)
-                    .responseMessage(REVOKE_ENROLLMENT_USER_NOT_FOUND_MESSAGE)
-                    .build();
-        }
-        final Enrollment fetchedExistingEnrollment = enrollmentRepository.findByTeacherIdAndStudentId(
-                fetchedTeacher.getTeacherId(),
-                fetchedStudent.getStudentId());
-        long numberOfRowsDeleted = enrollmentRepository.deleteByTeacherIdAndStudentId(
-                fetchedTeacher.getTeacherId(),
-                fetchedStudent.getStudentId());
-        if (numberOfRowsDeleted > 0) {
-            recordEnrollmentRevocation(revokeEnrollmentRequest, fetchedExistingEnrollment);
-            return RevokeEnrollmentResponse.builder()
-                    .responseCode(REVOKE_ENROLLMENT_SUCCESS_CODE)
-                    .responseMessage(REVOKE_ENROLLMENT_SUCCESS_MESSAGE)
-                    .build();
-        }
-        return RevokeEnrollmentResponse.builder()
-                .responseCode(REVOKE_ENROLLMENT_NOTHING_TO_REVOKE_CODE)
-                .responseMessage(REVOKE_ENROLLMENT_NOTHING_TO_REVOKE_MESSAGE)
-                .build();
     }
 
     private boolean checkNonexistentUser(Teacher fetchedTeacher, Student fetchedStudent) {

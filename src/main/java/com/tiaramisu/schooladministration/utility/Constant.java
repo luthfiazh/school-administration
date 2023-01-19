@@ -10,7 +10,7 @@ public class Constant {
         public static final String ADD_USER_SUCCESS_CODE = "201";
         public static final String ADD_USER_INVALID_REQUEST_CODE = "400";
         public static final String ENROLLMENT_INVALID_REQUEST_CODE = "400";
-        public static final String ADD_USER_GENERIC_ERROR_CODE = "500";
+        public static final String GENERIC_ERROR_CODE = "500";
         public static final String ENROLLMENT_SUCCESS_CODE = "204";
         public static final String REVOKE_ENROLLMENT_SUCCESS_CODE = "200";
         public static final String REVOKE_ENROLLMENT_NOTHING_TO_REVOKE_CODE = "200";
@@ -24,7 +24,7 @@ public class Constant {
         public static final String ADD_TEACHER_SUCCESS_MESSAGE = "Successfully registered a teacher";
         public static final String ADD_USER_INVALID_REQUEST_MESSAGE = "Email and name should not be empty";
         public static final String ADD_USER_DUPLICATE_ENTRY_MESSAGE = "User with provided email already exists";
-        public static final String ADD_USER_GENERIC_ERROR_MESSAGE = "Error occurred. Please contact developer";
+        public static final String GENERIC_ERROR_MESSAGE = "Error occurred. Please contact developer";
         public static final String ENROLLMENT_SUCCESS_MESSAGE = "Successfully enrolled";
         public static final String ENROLLMENT_INVALID_REQUEST_MESSAGE = "Teacher email cannot be null or empty";
         public static final String REVOKE_ENROLLMENT_SUCCESS_MESSAGE = "Successfully revoked enrollment";
