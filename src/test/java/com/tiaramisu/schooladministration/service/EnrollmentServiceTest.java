@@ -20,7 +20,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ENROLLMENT_INVALID_REQUEST_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ENROLLMENT_SUCCESS_CODE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ENROLLMENT_INVALID_REQUEST_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ENROLLMENT_SUCCESS_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.atMostOnce;
@@ -113,5 +115,19 @@ class EnrollmentServiceTest {
         verify(enrollmentRepository, atMostOnce()).saveAll(enrollmentsArgumentCaptor.capture());
         List<Enrollment> savedEnrollments = enrollmentsArgumentCaptor.getValue();
         assertEquals(2, savedEnrollments.size());
+    }
+
+    @Test
+    void enrollStudent_shouldReturnInvalidRequest_whenTeacherEmailIsEmptyOrNull() {
+        EnrollmentRequest request = EnrollmentRequest.builder()
+                .build();
+        final EnrollmentResponse EXPECTED_RESPONSE = EnrollmentResponse.builder()
+                .responseCode(ENROLLMENT_INVALID_REQUEST_CODE)
+                .responseMessage(ENROLLMENT_INVALID_REQUEST_MESSAGE)
+                .build();
+
+        EnrollmentResponse response = enrollmentService.enrollStudent(request);
+
+        assertEquals(EXPECTED_RESPONSE, response);
     }
 }
