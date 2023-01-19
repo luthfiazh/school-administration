@@ -15,8 +15,10 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ENROLLMENT_INVALID_REQUEST_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ENROLLMENT_SUCCESS_CODE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.GENERIC_ERROR_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ENROLLMENT_INVALID_REQUEST_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ENROLLMENT_SUCCESS_MESSAGE;
+import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.GENERIC_ERROR_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -75,6 +77,26 @@ class EnrollmentControllerTest {
                 .andReturn();
 
         verify(enrollmentService).enrollStudent(request);
+        assertEquals(responseInJson, result.getResponse().getContentAsString());
+    }
+
+    @Test
+    void register_shouldReturnHttpInternalError_whenErrorOccurred() throws Exception {
+        final EnrollmentRequest request = EnrollmentRequest.builder().build();
+        final EnrollmentResponse response = EnrollmentResponse.builder()
+                .responseCode(GENERIC_ERROR_CODE)
+                .responseMessage(GENERIC_ERROR_MESSAGE)
+                .build();
+        final String requestInJson = new ObjectMapper().writeValueAsString(request);
+        final String responseInJson = new ObjectMapper().writeValueAsString(response);
+        when(enrollmentService.enrollStudent(request)).thenReturn(response);
+
+        MvcResult result = mockMvc.perform(post(ENDPOINT_URI)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestInJson))
+                .andExpect(status().isInternalServerError())
+                .andReturn();
+
         assertEquals(responseInJson, result.getResponse().getContentAsString());
     }
 }
