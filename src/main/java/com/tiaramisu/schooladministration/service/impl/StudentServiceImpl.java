@@ -4,7 +4,7 @@ import com.tiaramisu.schooladministration.entity.Student;
 import com.tiaramisu.schooladministration.model.AddUserRequest;
 import com.tiaramisu.schooladministration.model.AddUserResponse;
 import com.tiaramisu.schooladministration.model.FetchStudentsEmailResponse;
-import com.tiaramisu.schooladministration.repository.EnrollmentRepository;
+import com.tiaramisu.schooladministration.repository.ExtendedEnrollmentRepository;
 import com.tiaramisu.schooladministration.repository.StudentRepository;
 import com.tiaramisu.schooladministration.repository.TeacherRepository;
 import com.tiaramisu.schooladministration.service.StudentService;
@@ -32,7 +32,7 @@ import static com.tiaramisu.schooladministration.utility.Generic.checkEmptyUserR
 public class StudentServiceImpl implements StudentService {
     private final StudentRepository studentRepository;
     private final TeacherRepository teacherRepository;
-    private final EnrollmentRepository enrollmentRepository;
+    private final ExtendedEnrollmentRepository extendedEnrollmentRepository;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -72,6 +72,7 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
+    @Transactional
     public FetchStudentsEmailResponse fetchCommonStudents(List<String> teachers) {
         final String PERCENT_ENCODED_AT_SIGN = "%40";
         final String AT_SIGN = "@";
@@ -81,8 +82,7 @@ public class StudentServiceImpl implements StudentService {
             emails.add(email);
         });
         final List<String> teacherIds = teacherRepository.findAllTeacherIdByEmailIn(emails);
-        final List<String> enrolledStudentIds = enrollmentRepository.findCommonStudentsIdByTeacherIds(teacherIds);
-        final List<String> enrolledStudentEmails = studentRepository.findAllEmailByStudentIds(enrolledStudentIds);
+        final List<String> enrolledStudentEmails = extendedEnrollmentRepository.findCommonStudentsIdByTeacherIds(teacherIds);
         return FetchStudentsEmailResponse.builder()
                 .students(enrolledStudentEmails)
                 .build();

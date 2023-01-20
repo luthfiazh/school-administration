@@ -4,9 +4,9 @@ import com.tiaramisu.schooladministration.entity.Student;
 import com.tiaramisu.schooladministration.model.AddUserRequest;
 import com.tiaramisu.schooladministration.model.AddUserResponse;
 import com.tiaramisu.schooladministration.model.FetchStudentsEmailResponse;
-import com.tiaramisu.schooladministration.repository.EnrollmentRepository;
 import com.tiaramisu.schooladministration.repository.StudentRepository;
 import com.tiaramisu.schooladministration.repository.TeacherRepository;
+import com.tiaramisu.schooladministration.repository.impl.ExtendedEnrollmentRepositoryImpl;
 import com.tiaramisu.schooladministration.service.impl.StudentServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,7 +47,7 @@ class StudentServiceTest {
     @Mock
     private TeacherRepository teacherRepository;
     @Mock
-    private EnrollmentRepository enrollmentRepository;
+    private ExtendedEnrollmentRepositoryImpl extendedEnrollmentRepository;
     @InjectMocks
     private StudentServiceImpl studentService;
 
@@ -152,11 +152,8 @@ class StudentServiceTest {
         teacherIds.add(HARRY_TEACHER_ID);
         teacherIds.add(HILLARY_TEACHER_ID);
         when(teacherRepository.findAllTeacherIdByEmailIn(inputTeachersConverted)).thenReturn(teacherIds);
-        final String JOHNNY_STUDENT_ID = "johnnyStudentId";
-        List<String> studentIds = Collections.singletonList(JOHNNY_STUDENT_ID);
-        when(enrollmentRepository.findCommonStudentsIdByTeacherIds(teacherIds)).thenReturn(studentIds);
         List<String> studentEmails = Collections.singletonList(DUMMY_STUDENT_EMAIL);
-        when(studentRepository.findAllEmailByStudentIds(studentIds)).thenReturn(studentEmails);
+        when(extendedEnrollmentRepository.findCommonStudentsIdByTeacherIds(teacherIds)).thenReturn(studentEmails);
         final FetchStudentsEmailResponse expectedResponse = FetchStudentsEmailResponse.builder()
                 .students(studentEmails)
                 .build();
