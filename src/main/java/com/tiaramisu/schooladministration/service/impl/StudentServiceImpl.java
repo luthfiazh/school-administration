@@ -3,6 +3,7 @@ package com.tiaramisu.schooladministration.service.impl;
 import com.tiaramisu.schooladministration.entity.Student;
 import com.tiaramisu.schooladministration.model.AddUserRequest;
 import com.tiaramisu.schooladministration.model.AddUserResponse;
+import com.tiaramisu.schooladministration.model.FetchStudentsEmailResponse;
 import com.tiaramisu.schooladministration.repository.StudentRepository;
 import com.tiaramisu.schooladministration.service.StudentService;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_USER_INVALID_REQUEST_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_USER_SUCCESS_CODE;
@@ -62,5 +64,10 @@ public class StudentServiceImpl implements StudentService {
                     .responseMessage(GENERIC_ERROR_MESSAGE)
                     .build();
         }
+    }
+
+    @Override
+    public FetchStudentsEmailResponse fetchCommonStudents(List<String> teacher) {
+        return null;
     }
 }

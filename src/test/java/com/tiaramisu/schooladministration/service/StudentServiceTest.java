@@ -3,6 +3,7 @@ package com.tiaramisu.schooladministration.service;
 import com.tiaramisu.schooladministration.entity.Student;
 import com.tiaramisu.schooladministration.model.AddUserRequest;
 import com.tiaramisu.schooladministration.model.AddUserResponse;
+import com.tiaramisu.schooladministration.model.FetchStudentsEmailResponse;
 import com.tiaramisu.schooladministration.repository.StudentRepository;
 import com.tiaramisu.schooladministration.service.impl.StudentServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -14,7 +15,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_USER_INVALID_REQUEST_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_USER_SUCCESS_CODE;
@@ -24,6 +27,7 @@ import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessag
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_USER_INVALID_REQUEST_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.GENERIC_ERROR_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -119,5 +123,15 @@ class StudentServiceTest {
 
         assertEquals(ADD_USER_INVALID_REQUEST_CODE, response.getResponseCode());
         assertEquals(ADD_USER_DUPLICATE_ENTRY_MESSAGE, response.getResponseMessage());
+    }
+
+    @Test
+    void fetchCommonStudents_shouldReturnNull_whenGivenListOfTeachers() {
+        final String TEACHER_EMAIL = "teacher@mail.com";
+        List<String> inputTeachers = Collections.singletonList(TEACHER_EMAIL);
+
+        FetchStudentsEmailResponse response = studentService.fetchCommonStudents(inputTeachers);
+
+        assertNull(response);
     }
 }

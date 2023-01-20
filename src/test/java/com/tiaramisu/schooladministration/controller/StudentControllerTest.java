@@ -21,14 +21,15 @@ import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessag
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.GENERIC_ERROR_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(StudentController.class)
 @ContextConfiguration(classes = {StudentController.class})
 class StudentControllerTest {
-    final String DUMMY_STUDENT_EMAIL = "student@school.com";
-    final String DUMMY_STUDENT_NAME = "Johnny Doe";
+    private final String STUDENTS_ENDPOINT_URI = "/students";
+    private final String DUMMY_STUDENT_NAME = "Johnny Doe";
     @Autowired
     private MockMvc mockMvc;
     @MockBean
@@ -36,7 +37,7 @@ class StudentControllerTest {
 
     @Test
     void add_shouldReturnHttpStatusCreatedAndExpectedResponseBody_whenGivenAppropriateRequestBody() throws Exception {
-        final String ENDPOINT_URI = "/students";
+        final String DUMMY_STUDENT_EMAIL = "student@school.com";
         final AddUserRequest request = AddUserRequest.builder()
                 .email(DUMMY_STUDENT_EMAIL)
                 .name(DUMMY_STUDENT_NAME)
@@ -50,7 +51,7 @@ class StudentControllerTest {
         final String requestInJson = new ObjectMapper().writeValueAsString(request);
         final String expectedResponseInJson = new ObjectMapper().writeValueAsString(response);
 
-        MvcResult result = mockMvc.perform(post(ENDPOINT_URI)
+        MvcResult result = mockMvc.perform(post(STUDENTS_ENDPOINT_URI)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestInJson))
                 .andExpect(status().isCreated())
@@ -61,7 +62,6 @@ class StudentControllerTest {
 
     @Test
     void add_shouldReturnHttpStatusNotAcceptableAndExpectedResponseBody_whenGivenRequestBodyWithNoEmail() throws Exception {
-        final String ENDPOINT_URI = "/students";
         final AddUserRequest request = AddUserRequest.builder()
                 .name(DUMMY_STUDENT_NAME)
                 .build();
@@ -73,7 +73,7 @@ class StudentControllerTest {
         final String requestInJson = new ObjectMapper().writeValueAsString(request);
         final String expectedResponseInJson = new ObjectMapper().writeValueAsString(response);
 
-        MvcResult result = mockMvc.perform(post(ENDPOINT_URI)
+        MvcResult result = mockMvc.perform(post(STUDENTS_ENDPOINT_URI)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestInJson))
                 .andExpect(status().isNotAcceptable())
@@ -84,7 +84,6 @@ class StudentControllerTest {
 
     @Test
     void add_shouldReturnHttpStatusInternalServerErrorAndExpectedResponseBody_whenServiceMethodReturnsWithResponseCodeNot201Or400() throws Exception {
-        final String ENDPOINT_URI = "/students";
         final AddUserRequest request = AddUserRequest.builder()
                 .name(DUMMY_STUDENT_NAME)
                 .build();
@@ -96,12 +95,22 @@ class StudentControllerTest {
         final String requestInJson = new ObjectMapper().writeValueAsString(request);
         final String expectedResponseInJson = new ObjectMapper().writeValueAsString(response);
 
-        MvcResult result = mockMvc.perform(post(ENDPOINT_URI)
+        MvcResult result = mockMvc.perform(post(STUDENTS_ENDPOINT_URI)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestInJson))
                 .andExpect(status().isInternalServerError())
                 .andReturn();
 
         assertEquals(expectedResponseInJson, result.getResponse().getContentAsString());
+    }
+
+    @Test
+    void getCommonStudents_shouldReturnHttpOk_whenGivenRequestParameters() throws Exception {
+        final String COMMON_STUDENTS_ENDPOINT_URI = "/commonstudents?teacher=teacher%40mail.com&teacher=madonna%40mail.com";
+
+        mockMvc.perform(get(COMMON_STUDENTS_ENDPOINT_URI)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
     }
 }
