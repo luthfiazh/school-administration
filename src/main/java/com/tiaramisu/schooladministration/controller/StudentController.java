@@ -39,6 +39,6 @@ public class StudentController {
 
     @GetMapping(value = "/commonstudents", produces = "application/json")
     public ResponseEntity<FetchStudentsEmailResponse> getCommonStudents(@RequestParam List<String> teacher) {
-        return null;
+        return ResponseEntity.status(HttpStatus.OK).body(studentService.fetchCommonStudents(teacher));
     }
 }

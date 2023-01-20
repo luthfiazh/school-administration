@@ -3,6 +3,7 @@ package com.tiaramisu.schooladministration.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tiaramisu.schooladministration.model.AddUserRequest;
 import com.tiaramisu.schooladministration.model.AddUserResponse;
+import com.tiaramisu.schooladministration.model.FetchStudentsEmailResponse;
 import com.tiaramisu.schooladministration.service.impl.StudentServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_USER_INVALID_REQUEST_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_USER_SUCCESS_CODE;
@@ -107,10 +112,23 @@ class StudentControllerTest {
     @Test
     void getCommonStudents_shouldReturnHttpOk_whenGivenRequestParameters() throws Exception {
         final String COMMON_STUDENTS_ENDPOINT_URI = "/commonstudents?teacher=teacher%40mail.com&teacher=madonna%40mail.com";
+        final String TEACHER_EMAIL = "teacher%40mail.com";
+        final String MADONNA_TEACHER_EMAIL = "madonna%40mail.com";
+        List<String> inputTeacherEmails = new ArrayList<>();
+        inputTeacherEmails.add(TEACHER_EMAIL);
+        inputTeacherEmails.add(MADONNA_TEACHER_EMAIL);
+        final String STUDENT_EMAIL = "student@mail.com";
+        final FetchStudentsEmailResponse response = FetchStudentsEmailResponse.builder()
+                .students(Collections.singletonList(STUDENT_EMAIL))
+                .build();
+        when(studentService.fetchCommonStudents(inputTeacherEmails)).thenReturn(response);
+        final String expectedResponseInJson = new ObjectMapper().writeValueAsString(response);
 
-        mockMvc.perform(get(COMMON_STUDENTS_ENDPOINT_URI)
+        MvcResult result = mockMvc.perform(get(COMMON_STUDENTS_ENDPOINT_URI)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
+
+        assertEquals(expectedResponseInJson, result.getResponse().getContentAsString());
     }
 }
