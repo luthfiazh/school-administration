@@ -3,7 +3,10 @@ package com.tiaramisu.schooladministration.service;
 import com.tiaramisu.schooladministration.entity.Teacher;
 import com.tiaramisu.schooladministration.model.AddUserRequest;
 import com.tiaramisu.schooladministration.model.AddUserResponse;
+import com.tiaramisu.schooladministration.model.FetchTeachersResponse;
+import com.tiaramisu.schooladministration.model.TeacherStudentsMapping;
 import com.tiaramisu.schooladministration.repository.TeacherRepository;
+import com.tiaramisu.schooladministration.repository.impl.ExtendedTeacherRepositoryImpl;
 import com.tiaramisu.schooladministration.service.impl.TeacherServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 
+import java.util.Collections;
 import java.util.Date;
 
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_USER_INVALID_REQUEST_CODE;
@@ -24,7 +28,6 @@ import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessag
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_USER_INVALID_REQUEST_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.GENERIC_ERROR_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -36,6 +39,9 @@ class TeacherServiceTest {
     private final String DUMMY_NAME = "Janey Doe";
     @Mock
     private TeacherRepository teacherRepository;
+
+    @Mock
+    private ExtendedTeacherRepositoryImpl extendedTeacherRepository;
     @InjectMocks
     private TeacherServiceImpl teacherService;
 
@@ -123,7 +129,17 @@ class TeacherServiceTest {
     }
 
     @Test
-    void fetchTeachers_shouldReturnNull_whenCalled() {
-        assertNull(teacherService.fetchTeachers());
+    void fetchTeachers_shouldReturn1Teacher_whenQueryResultReturns1Teacher() {
+        final String STUDENT_EMAIL = "student@mail.com";
+        TeacherStudentsMapping mapping = TeacherStudentsMapping.builder()
+                .email(DUMMY_EMAIL)
+                .students(Collections.singletonList(STUDENT_EMAIL))
+                .build();
+        when(extendedTeacherRepository.findAllTeacher()).thenReturn(Collections.singletonList(mapping));
+
+        FetchTeachersResponse result = teacherService.fetchTeachers();
+
+        assertEquals(mapping, result.getTeachers().get(0));
+        assertEquals(STUDENT_EMAIL, result.getTeachers().get(0).getStudents().get(0));
     }
 }

@@ -8,5 +8,5 @@ import java.util.List;
 @Data
 @Builder
 public class FetchTeachersResponse {
-    private List<Teachers> teachers;
+    private List<TeacherStudentsMapping> teachers;
 }

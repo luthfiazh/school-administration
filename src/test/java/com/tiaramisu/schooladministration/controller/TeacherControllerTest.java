@@ -3,6 +3,7 @@ package com.tiaramisu.schooladministration.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tiaramisu.schooladministration.model.AddUserRequest;
 import com.tiaramisu.schooladministration.model.AddUserResponse;
+import com.tiaramisu.schooladministration.model.FetchTeachersResponse;
 import com.tiaramisu.schooladministration.service.impl.TeacherServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.util.Collections;
+
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_USER_INVALID_REQUEST_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.ADD_USER_SUCCESS_CODE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseCode.GENERIC_ERROR_CODE;
@@ -21,6 +24,7 @@ import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessag
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.GENERIC_ERROR_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -99,6 +103,22 @@ class TeacherControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestInJson))
                 .andExpect(status().isInternalServerError())
+                .andReturn();
+
+        assertEquals(expectedResponseInJson, result.getResponse().getContentAsString());
+    }
+
+    @Test
+    void fetchTeachers_shouldReturnHttpOk_whenInvokedWithHttpMethodGET() throws Exception {
+        FetchTeachersResponse response = FetchTeachersResponse.builder()
+                .teachers(Collections.emptyList())
+                .build();
+        final String expectedResponseInJson = new ObjectMapper().writeValueAsString(response);
+        when(teacherService.fetchTeachers()).thenReturn(response);
+
+        MvcResult result = mockMvc.perform(get(ENDPOINT_URI)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
                 .andReturn();
 
         assertEquals(expectedResponseInJson, result.getResponse().getContentAsString());

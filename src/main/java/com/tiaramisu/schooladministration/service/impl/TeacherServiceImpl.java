@@ -4,6 +4,7 @@ import com.tiaramisu.schooladministration.entity.Teacher;
 import com.tiaramisu.schooladministration.model.AddUserRequest;
 import com.tiaramisu.schooladministration.model.AddUserResponse;
 import com.tiaramisu.schooladministration.model.FetchTeachersResponse;
+import com.tiaramisu.schooladministration.repository.ExtendedTeacherRepository;
 import com.tiaramisu.schooladministration.repository.TeacherRepository;
 import com.tiaramisu.schooladministration.service.TeacherService;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ import static com.tiaramisu.schooladministration.utility.Generic.checkEmptyUserR
 @RequiredArgsConstructor
 public class TeacherServiceImpl implements TeacherService {
     private final TeacherRepository teacherRepository;
+    private final ExtendedTeacherRepository extendedTeacherRepository;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -67,6 +69,8 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Override
     public FetchTeachersResponse fetchTeachers() {
-        return null;
+        return FetchTeachersResponse.builder()
+                .teachers(extendedTeacherRepository.findAllTeacher())
+                .build();
     }
 }

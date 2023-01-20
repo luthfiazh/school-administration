@@ -2,10 +2,12 @@ package com.tiaramisu.schooladministration.controller;
 
 import com.tiaramisu.schooladministration.model.AddUserRequest;
 import com.tiaramisu.schooladministration.model.AddUserResponse;
+import com.tiaramisu.schooladministration.model.FetchTeachersResponse;
 import com.tiaramisu.schooladministration.service.TeacherService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,5 +32,10 @@ public class TeacherController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @GetMapping(value = "/teachers", produces = "application/json")
+    public ResponseEntity<FetchTeachersResponse> fetchTeachers() {
+        return ResponseEntity.status(HttpStatus.OK).body(teacherService.fetchTeachers());
     }
 }
