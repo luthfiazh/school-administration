@@ -50,7 +50,6 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     private final RevocationRepository revocationRepository;
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public EnrollmentResponse enrollStudent(EnrollmentRequest enrollmentRequest) {
         try {
             if (checkEmptyEnrollmentRequest(enrollmentRequest)) {
