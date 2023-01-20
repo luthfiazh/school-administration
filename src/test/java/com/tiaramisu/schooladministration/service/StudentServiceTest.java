@@ -4,17 +4,21 @@ import com.tiaramisu.schooladministration.entity.Student;
 import com.tiaramisu.schooladministration.model.AddUserRequest;
 import com.tiaramisu.schooladministration.model.AddUserResponse;
 import com.tiaramisu.schooladministration.model.FetchStudentsEmailResponse;
+import com.tiaramisu.schooladministration.repository.EnrollmentRepository;
 import com.tiaramisu.schooladministration.repository.StudentRepository;
+import com.tiaramisu.schooladministration.repository.TeacherRepository;
 import com.tiaramisu.schooladministration.service.impl.StudentServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -27,7 +31,6 @@ import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessag
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_USER_INVALID_REQUEST_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.GENERIC_ERROR_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -37,8 +40,14 @@ import static org.mockito.Mockito.when;
 class StudentServiceTest {
     final String DUMMY_STUDENT_EMAIL = "student@school.com";
     final String DUMMY_STUDENT_NAME = "Johnny Doe";
+    @Captor
+    ArgumentCaptor<List<String>> emailsArgumentCaptor;
     @Mock
     private StudentRepository studentRepository;
+    @Mock
+    private TeacherRepository teacherRepository;
+    @Mock
+    private EnrollmentRepository enrollmentRepository;
     @InjectMocks
     private StudentServiceImpl studentService;
 
@@ -126,12 +135,38 @@ class StudentServiceTest {
     }
 
     @Test
-    void fetchCommonStudents_shouldReturnNull_whenGivenListOfTeachers() {
-        final String TEACHER_EMAIL = "teacher@mail.com";
-        List<String> inputTeachers = Collections.singletonList(TEACHER_EMAIL);
+    void fetchCommonStudents_shouldResponseWith1Email_whenGivenAppropriateListOfTeachers() {
+        final String HARRY_TEACHER_EMAIL = "harry%40teacher.com";
+        final String HILLARY_TEACHER_EMAIL = "hillary%40teacher.com";
+        final String HARRY_TEACHER_EMAIL_CONVERTED = "harry@teacher.com";
+        final String HILLARY_TEACHER_EMAIL_CONVERTED = "hillary@teacher.com";
+        List<String> inputTeachers = new ArrayList<>();
+        inputTeachers.add(HARRY_TEACHER_EMAIL);
+        inputTeachers.add(HILLARY_TEACHER_EMAIL);
+        List<String> inputTeachersConverted = new ArrayList<>();
+        inputTeachersConverted.add(HARRY_TEACHER_EMAIL_CONVERTED);
+        inputTeachersConverted.add(HILLARY_TEACHER_EMAIL_CONVERTED);
+        final String HARRY_TEACHER_ID = "harryTeacherId";
+        final String HILLARY_TEACHER_ID = "hillaryTeacherId";
+        List<String> teacherIds = new ArrayList<>();
+        teacherIds.add(HARRY_TEACHER_ID);
+        teacherIds.add(HILLARY_TEACHER_ID);
+        when(teacherRepository.findAllTeacherIdByEmailIn(inputTeachersConverted)).thenReturn(teacherIds);
+        final String JOHNNY_STUDENT_ID = "johnnyStudentId";
+        List<String> studentIds = Collections.singletonList(JOHNNY_STUDENT_ID);
+        when(enrollmentRepository.findCommonStudentsIdByTeacherIds(teacherIds)).thenReturn(studentIds);
+        List<String> studentEmails = Collections.singletonList(DUMMY_STUDENT_EMAIL);
+        when(studentRepository.findAllEmailByStudentIds(studentIds)).thenReturn(studentEmails);
+        final FetchStudentsEmailResponse expectedResponse = FetchStudentsEmailResponse.builder()
+                .students(studentEmails)
+                .build();
 
         FetchStudentsEmailResponse response = studentService.fetchCommonStudents(inputTeachers);
 
-        assertNull(response);
+        verify(teacherRepository).findAllTeacherIdByEmailIn(emailsArgumentCaptor.capture());
+        final List<String> emailsCapturedArgument = emailsArgumentCaptor.getValue();
+        assertEquals(HARRY_TEACHER_EMAIL_CONVERTED, emailsCapturedArgument.get(0));
+        assertEquals(HILLARY_TEACHER_EMAIL_CONVERTED, emailsCapturedArgument.get(1));
+        assertEquals(expectedResponse, response);
     }
 }

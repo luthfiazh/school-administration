@@ -9,5 +9,5 @@ import java.util.List;
 public interface StudentService {
     AddUserResponse addStudent(AddUserRequest addUserRequest);
 
-    FetchStudentsEmailResponse fetchCommonStudents(List<String> teacher);
+    FetchStudentsEmailResponse fetchCommonStudents(List<String> teachers);
 }

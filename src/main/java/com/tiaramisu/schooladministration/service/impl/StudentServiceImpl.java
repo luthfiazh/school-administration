@@ -4,7 +4,9 @@ import com.tiaramisu.schooladministration.entity.Student;
 import com.tiaramisu.schooladministration.model.AddUserRequest;
 import com.tiaramisu.schooladministration.model.AddUserResponse;
 import com.tiaramisu.schooladministration.model.FetchStudentsEmailResponse;
+import com.tiaramisu.schooladministration.repository.EnrollmentRepository;
 import com.tiaramisu.schooladministration.repository.StudentRepository;
+import com.tiaramisu.schooladministration.repository.TeacherRepository;
 import com.tiaramisu.schooladministration.service.StudentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -28,6 +31,8 @@ import static com.tiaramisu.schooladministration.utility.Generic.checkEmptyUserR
 @RequiredArgsConstructor
 public class StudentServiceImpl implements StudentService {
     private final StudentRepository studentRepository;
+    private final TeacherRepository teacherRepository;
+    private final EnrollmentRepository enrollmentRepository;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -67,7 +72,19 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public FetchStudentsEmailResponse fetchCommonStudents(List<String> teacher) {
-        return null;
+    public FetchStudentsEmailResponse fetchCommonStudents(List<String> teachers) {
+        final String PERCENT_ENCODED_AT_SIGN = "%40";
+        final String AT_SIGN = "@";
+        List<String> emails = new ArrayList<>();
+        teachers.forEach(teacher -> {
+            final String email = teacher.replace(PERCENT_ENCODED_AT_SIGN, AT_SIGN);
+            emails.add(email);
+        });
+        final List<String> teacherIds = teacherRepository.findAllTeacherIdByEmailIn(emails);
+        final List<String> enrolledStudentIds = enrollmentRepository.findCommonStudentsIdByTeacherIds(teacherIds);
+        final List<String> enrolledStudentEmails = studentRepository.findAllEmailByStudentIds(enrolledStudentIds);
+        return FetchStudentsEmailResponse.builder()
+                .students(enrolledStudentEmails)
+                .build();
     }
 }
