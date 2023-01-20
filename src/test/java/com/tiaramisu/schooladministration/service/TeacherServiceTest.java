@@ -24,6 +24,7 @@ import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessag
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.ADD_USER_INVALID_REQUEST_MESSAGE;
 import static com.tiaramisu.schooladministration.utility.Constant.ResponseMessage.GENERIC_ERROR_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -119,5 +120,10 @@ class TeacherServiceTest {
 
         assertEquals(ADD_USER_INVALID_REQUEST_CODE, response.getResponseCode());
         assertEquals(ADD_USER_DUPLICATE_ENTRY_MESSAGE, response.getResponseMessage());
+    }
+
+    @Test
+    void fetchTeachers_shouldReturnNull_whenCalled() {
+        assertNull(teacherService.fetchTeachers());
     }
 }

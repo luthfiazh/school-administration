@@ -3,6 +3,7 @@ package com.tiaramisu.schooladministration.service.impl;
 import com.tiaramisu.schooladministration.entity.Teacher;
 import com.tiaramisu.schooladministration.model.AddUserRequest;
 import com.tiaramisu.schooladministration.model.AddUserResponse;
+import com.tiaramisu.schooladministration.model.FetchTeachersResponse;
 import com.tiaramisu.schooladministration.repository.TeacherRepository;
 import com.tiaramisu.schooladministration.service.TeacherService;
 import lombok.RequiredArgsConstructor;
@@ -62,5 +63,10 @@ public class TeacherServiceImpl implements TeacherService {
                     .responseMessage(GENERIC_ERROR_MESSAGE)
                     .build();
         }
+    }
+
+    @Override
+    public FetchTeachersResponse fetchTeachers() {
+        return null;
     }
 }
