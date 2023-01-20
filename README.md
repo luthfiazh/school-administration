@@ -7,7 +7,7 @@ Before starting up this app, please note the following:
 You may run the app using the following command, via terminal
 > mvn spring-boot:run
 
-If database connection is configured properly, when app is started, it will run Liquibase and create necessary tables for the app
+If database connection is configured properly, when the app is started, it will run Liquibase and create necessary tables for the app
 
 Unless otherwise configured, you can access the app at **_localhost:8080/school-administration/api_** after successfully running it
 
