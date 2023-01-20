@@ -1,0 +1,226 @@
+{
+	"info": {
+		"_postman_id": "318f43db-7cc9-42ca-8331-348c567dd98e",
+		"name": "School-administration",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "24679905"
+	},
+	"item": [
+		{
+			"name": "Add new Student entry",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"jane@student.com\",\r\n    \"name\": \"Jane\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/school-administration/api/students",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"school-administration",
+						"api",
+						"students"
+					]
+				},
+				"description": "POST request for creating new Student, bearing email and name fields"
+			},
+			"response": []
+		},
+		{
+			"name": "Add new Teacher entry",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"john@teacher.com\",\r\n    \"name\": \"John\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/school-administration/api/teachers",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"school-administration",
+						"api",
+						"teachers"
+					]
+				},
+				"description": "POST request to create Teacher, bearing email and name fields"
+			},
+			"response": []
+		},
+		{
+			"name": "Register / Enroll Student under a Teacher",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"teacher\": \"john@teacher.com\",\r\n    \"students\": [\r\n        \"jane@student.com\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/school-administration/api/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"school-administration",
+						"api",
+						"register"
+					]
+				},
+				"description": "POST request to register/enroll Student under a Teacher, given teacher's email and student emails"
+			},
+			"response": []
+		},
+		{
+			"name": "Revoke Student enrollment from a given Teacher",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"teacher\": \"john@teacher.com\",\r\n    \"student\": \"jane@student.com\",\r\n    \"reason\": \"Graduated\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/school-administration/api/deregister",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"school-administration",
+						"api",
+						"deregister"
+					]
+				},
+				"description": "POST request to revoke Student enrollment from a Teacher, bearing Teacher email, Student email, and reason for disenrollment"
+			},
+			"response": []
+		},
+		{
+			"name": "Fetch a list of Student enrolled under given Teachers",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/school-administration/api/commonstudents?teacher=john%40teacher.com",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"school-administration",
+						"api",
+						"commonstudents"
+					],
+					"query": [
+						{
+							"key": "teacher",
+							"value": "john%40teacher.com"
+						}
+					]
+				},
+				"description": "GET request for fetching list of Students under enrollment of given Teachers. Takes request parameters"
+			},
+			"response": []
+		},
+		{
+			"name": "Fetch a list of all Teachers, with enrolled Students",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/school-administration/api/teachers",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"school-administration",
+						"api",
+						"teachers"
+					]
+				},
+				"description": "GET request for fetching a list of all Teachers and enrolled students"
+			},
+			"response": []
+		}
+	]
+}
