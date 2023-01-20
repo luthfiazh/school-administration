@@ -18,6 +18,7 @@ public class TeacherStudentsMapping {
 
     public TeacherStudentsMapping(String email, String students) {
         this.email = email;
-        this.students = Arrays.asList(students.split(","));
+        final String[] arrayOfEmails = students != null ? students.split(",") : new String[]{};
+        this.students = Arrays.asList(arrayOfEmails);
     }
 }
