@@ -11,8 +11,6 @@ import com.tiaramisu.schooladministration.service.StudentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,7 +33,6 @@ public class StudentServiceImpl implements StudentService {
     private final ExtendedEnrollmentRepository extendedEnrollmentRepository;
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public AddUserResponse addStudent(AddUserRequest addStudentRequest) {
         try {
             if (checkEmptyUserRequest(addStudentRequest)) {
@@ -72,7 +69,6 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    @Transactional
     public FetchStudentsEmailResponse fetchCommonStudents(List<String> teachers) {
         final String PERCENT_ENCODED_AT_SIGN = "%40";
         final String AT_SIGN = "@";

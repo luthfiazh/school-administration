@@ -10,8 +10,6 @@ import com.tiaramisu.schooladministration.service.TeacherService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 
@@ -31,7 +29,6 @@ public class TeacherServiceImpl implements TeacherService {
     private final ExtendedTeacherRepository extendedTeacherRepository;
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public AddUserResponse addTeacher(AddUserRequest addTeacherRequest) {
         try {
             if (checkEmptyUserRequest(addTeacherRequest)) {
