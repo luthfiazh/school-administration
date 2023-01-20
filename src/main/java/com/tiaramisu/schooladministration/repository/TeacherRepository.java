@@ -12,6 +12,6 @@ import java.util.List;
 public interface TeacherRepository extends JpaRepository<Teacher, String> {
     Teacher findByEmail(String teacher);
 
-    @Query("SELECT teacher_id FROM teachers WHERE email IN :emails")
+    @Query(value = "SELECT teacher_id FROM teachers WHERE email IN :emails", nativeQuery = true)
     List<String> findAllTeacherIdByEmailIn(@Param("emails") List<String> emails);
 }

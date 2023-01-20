@@ -14,9 +14,9 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, String> 
 
     long deleteByTeacherIdAndStudentId(String teacherId, String studentId);
 
-    @Query("SELECT e1.student_id FROM enrollments e1" +
-            "INNER JOIN enrollments e2 ON e1.student_id = e2.student_id" +
-            "WHERE e1.teacher_id IN :teacherIds AND eq.teacher_id IN :teacherIds" +
-            "GROUP BY e1.student_id")
+    @Query(value = "SELECT e1.student_id FROM enrollments e1 " +
+            "INNER JOIN enrollments e2 ON e1.student_id = e2.student_id " +
+            "WHERE e1.teacher_id IN :teacherIds AND e2.teacher_id IN :teacherIds " +
+            "GROUP BY e1.student_id", nativeQuery = true)
     List<String> findCommonStudentsIdByTeacherIds(@Param("teacherIds") List<String> teacherIds);
 }

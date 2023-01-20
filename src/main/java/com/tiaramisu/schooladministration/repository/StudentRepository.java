@@ -14,6 +14,6 @@ public interface StudentRepository extends JpaRepository<Student, String> {
 
     Student findByEmail(String email);
 
-    @Query("SELECT email FROM students WHERE student_id IN :studentIds")
+    @Query(value = "SELECT email FROM students WHERE student_id IN :studentIds", nativeQuery = true)
     List<String> findAllEmailByStudentIds(@Param("studentIds") List<String> studentIds);
 }
